@@ -1,0 +1,31 @@
+src/app/api/auth/verify/route.ts
+  s_03be98155c9f0c::t_2ce9d2cb1758f7 52-53
+src/lib/session.ts
+  s_03be98155c9f0c::t_7bbfe292faf185 30-31
+src/app/api/stripe/checkout/route.ts
+  s_03be98155c9f0c::t_a553d653e43434 3
+src/app/dashboard/invoices/[id]/page.tsx
+  s_03be98155c9f0c::t_625c973a2696d9 193-194
+src/lib/db.ts
+  s_03be98155c9f0c::t_10b11c3f70761d 8,12,18-20,23-24
+src/app/api/auth/logout/route.ts
+  s_03be98155c9f0c::t_b85fe7f1aaa7d6 7-8
+src/app/api/cron/send-reminders/route.ts
+  s_03be98155c9f0c::t_53ba5ca3306f7a 5-20,28
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "b9c1a9fefe31e3b230f0644b571bfb13a5c4457e",
+  "prompts": {},
+  "sessions": {
+    "s_03be98155c9f0c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ses_022cc5a18ffeY19apSwRCYOgWe",
+        "model": "unknown"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
