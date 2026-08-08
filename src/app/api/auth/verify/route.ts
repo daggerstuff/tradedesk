@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { queryOne } from "@/lib/db"
-import { signJwt } from "@/lib/auth"
+import { signToken } from "@/lib/auth"
 import { setSessionCookie } from "@/lib/session"
 
 export const runtime = "nodejs"
@@ -43,10 +43,9 @@ export async function GET(req: NextRequest) {
     }
 
     // Create session JWT
-    const jwt = await signJwt({
+    const jwt = await signToken({
       userId: user.id,
       email: user.email,
-      name: user.name,
     })
 
     // Set cookie and redirect to dashboard

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { queryOne } from "@/lib/db"
-import { generateId, generateToken, signJwt } from "@/lib/auth"
-import { sendMagicLinkEmail } from "@/lib/resend"
+import { generateId, generateToken } from "@/lib/auth"
+import { sendEmail, magicLinkEmail } from "@/lib/resend"
 
 export const runtime = "nodejs"
 
@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
     const magicLink = `${baseUrl}/api/auth/verify?token=${token}`
 
-    await sendMagicLinkEmail(normalizedEmail, name || "there", magicLink)
+    await sendEmail({ to: normalizedEmail, subject: "Welcome to TradeDesk", html: magicLinkEmail(name || "there", magicLink) })
 
     return NextResponse.json({ success: true })
   } catch (error) {

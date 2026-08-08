@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { query } from '@/lib/db';
-import { sendInvoiceReminder } from '@/lib/resend';
+import { sendEmail } from '@/lib/resend';
 
 export async function GET(req: NextRequest) {
   const authHeader = req.headers.get('authorization');
@@ -45,7 +45,7 @@ export async function GET(req: NextRequest) {
       .replace('{issue_date}', r.issue_date?.split('T')[0]);
 
     try {
-      await sendInvoiceReminder(r.customer_email, emailSubject, emailBody);
+      await sendEmail({ to: r.customer_email, subject: emailSubject, html: emailBody });
 
       await query(
         `INSERT INTO reminders (invoice_id, template_id, reminder_date, status)

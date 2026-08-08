@@ -102,7 +102,7 @@ export default function ReminderTemplatesPage() {
             <textarea required rows={5} value={form.body}
               onChange={e => setForm({ ...form, body: e.target.value })}
               className="w-full rounded-md border border-gray-300 px-3 py-2"
-              placeholder={'Hi {customer_name},\n\nThis is a reminder that invoice {invoice_number} for ${'total'} is due on {due_date}.\n\nThank you!'} />
+              placeholder={`Hi {customer_name},\n\nThis is a reminder that invoice {invoice_number} for \${total} is due on {due_date}.\n\nThank you!`} />
             <p className="text-xs text-gray-500 mt-1">
               Variables: {'{customer_name}, {invoice_number}, {total}, {due_date}, {issue_date}'}
             </p>
