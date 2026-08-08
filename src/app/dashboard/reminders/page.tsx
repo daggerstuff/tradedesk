@@ -119,7 +119,7 @@ export default function ReminderTemplatesPage() {
         </form>
       )}
 
-      <div className="bg-white rounded-lg shadow overflow-hidden">
+      <div className="bg-white rounded-lg shadow overflow-x-auto">
         {templates.length === 0 ? (
           <div className="p-8 text-center text-gray-500">
             No reminder templates yet. Create one to start sending automatic reminders.

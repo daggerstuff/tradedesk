@@ -172,7 +172,7 @@ export default function InvoiceDetailPage() {
       </div>
 
       <div className="bg-white rounded-lg shadow p-6 space-y-6">
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-500">Customer</label>
             {editing ? (
@@ -278,7 +278,7 @@ export default function InvoiceDetailPage() {
           {/* Payment form */}
           {showPaymentForm && (
             <div className="rounded-lg border border-gray-200 p-4 mb-3 bg-gray-50">
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <input type="number" step="0.01" placeholder="Amount" value={payAmount} onChange={e => setPayAmount(e.target.value)}
                   className="rounded-lg border border-gray-300 px-3 py-2 text-sm" />
                 <select value={payMethod} onChange={e => setPayMethod(e.target.value)}

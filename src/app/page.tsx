@@ -52,7 +52,7 @@ export default function LandingPage() {
             <p className="mt-6 text-lg text-slate-300 sm:text-xl">
               Invoice reminders, compliance tracking, and field service management — all in one place.
             </p>
-            <div className="mt-10 flex items-center justify-center gap-4">
+            <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
               <Link
                 href="/signup"
                 className="rounded-lg bg-indigo-600 px-8 py-3.5 text-base font-semibold text-white transition-colors hover:bg-indigo-500"

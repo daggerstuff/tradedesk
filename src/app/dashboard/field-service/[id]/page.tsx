@@ -71,7 +71,7 @@ export default function JobDetailPage() {
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Customer: {job.customer_name}</label>
         </div>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
             <select value={job.status} onChange={(e) => setJob({ ...job, status: e.target.value })} className="w-full border rounded-lg px-3 py-2">
@@ -90,7 +90,7 @@ export default function JobDetailPage() {
           <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
           <input type="text" value={job.location || ""} onChange={(e) => setJob({ ...job, location: e.target.value })} className="w-full border rounded-lg px-3 py-2" />
         </div>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Estimate Amount</label>
             <input type="number" step="0.01" value={job.estimate_amount || ""} onChange={(e) => setJob({ ...job, estimate_amount: e.target.value })} className="w-full border rounded-lg px-3 py-2" />

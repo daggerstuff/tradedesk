@@ -1,4 +1,3 @@
-import Link from "next/link"
 import { redirect } from "next/navigation"
 import { getSession } from "@/lib/session"
 import { queryOne } from "@/lib/db"
@@ -21,9 +20,10 @@ export default async function DashboardLayout({
   )
 
   return (
-    <div className="flex min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50">
       <SidebarNav userName={user?.name || "User"} userEmail={user?.email || ""} />
-      <div className="flex-1 lg:ml-64">
+      {/* pt-14 for mobile top bar, lg:pt-0 removes it on desktop */}
+      <div className="lg:ml-64 pt-14 lg:pt-0">
         {children}
       </div>
     </div>

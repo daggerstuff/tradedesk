@@ -1,10 +1,54 @@
 {
-  "name": "TradeDesk Field Service",
+  "name": "TradeDesk — Business Tools",
   "short_name": "TradeDesk",
-  "description": "Field service management for small businesses",
-  "start_url": "/dashboard/field-service",
+  "description": "Invoice reminders, quotes, expense tracking, compliance, and field service management for small businesses and trades.",
+  "start_url": "/dashboard",
+  "scope": "/",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#0f172a",
   "theme_color": "#0f172a",
-  "icons": []
+  "categories": ["business", "finance", "productivity"],
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "New Invoice",
+      "url": "/dashboard/invoices/new",
+      "icons": [{ "src": "/icon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "New Quote",
+      "url": "/dashboard/quotes/new",
+      "icons": [{ "src": "/icon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "Add Expense",
+      "url": "/dashboard/expenses/new",
+      "icons": [{ "src": "/icon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "New Job",
+      "url": "/dashboard/field-service/new",
+      "icons": [{ "src": "/icon.svg", "sizes": "any" }]
+    }
+  ]
 }
