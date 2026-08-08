@@ -51,6 +51,32 @@ export async function createBillingPortalSession(customerId: string, returnUrl: 
   });
 }
 
+export async function createInvoiceCheckoutSession(
+  invoiceId: string,
+  amount: number,
+  customerEmail: string,
+  customerName: string,
+  successUrl: string,
+  cancelUrl: string
+): Promise<Stripe.Checkout.Session> {
+  return stripe.checkout.sessions.create({
+    payment_method_types: ['card'],
+    mode: 'payment',
+    customer_email: customerEmail,
+    line_items: [{
+      price_data: {
+        currency: 'usd',
+        product_data: { name: `Invoice Payment` },
+        unit_amount: Math.round(amount * 100),
+      },
+      quantity: 1,
+    }],
+    metadata: { invoiceId, type: 'invoice_payment' },
+    success_url: successUrl,
+    cancel_url: cancelUrl,
+  });
+}
+
 export function constructWebhookEvent(payload: Buffer, signature: string): Stripe.Event {
   return stripe.webhooks.constructEvent(
     payload,

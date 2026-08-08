@@ -15,8 +15,36 @@ export async function POST(req: NextRequest) {
 
     switch (event.type) {
       case 'checkout.session.completed': {
-        const session = event.data.object as { customer?: string; client_reference_id?: string; metadata?: { plan?: string } };
-        const plan = session.metadata?.plan || 'free';
+        const session = event.data.object as { customer?: string; client_reference_id?: string; metadata?: { plan?: string; invoiceId?: string; type?: string } };
+        const metadata = session.metadata || {};
+
+        if (metadata.type === 'invoice_payment' && metadata.invoiceId) {
+          const amountTotal = (event.data.object as { amount_total?: number }).amount_total || 0;
+          const amountReceived = amountTotal / 100;
+          const paymentMethod = 'stripe';
+
+          await queryOne(
+            `INSERT INTO payments (id, invoice_id, amount, method, date, reference)
+             VALUES (gen_random_uuid(), $1, $2, $3, NOW(), $4)
+             ON CONFLICT DO NOTHING`,
+            [metadata.invoiceId, amountReceived, paymentMethod, session.id || 'stripe']
+          );
+
+          const totalPaidResult = await queryOne(
+            `SELECT COALESCE(SUM(amount), 0) as total_paid FROM payments WHERE invoice_id = $1`,
+            [metadata.invoiceId]
+          );
+          const totalPaid = totalPaidResult?.total_paid || 0;
+
+          const invoice = await queryOne('SELECT total FROM invoices WHERE id = $1', [metadata.invoiceId]);
+          if (invoice && totalPaid >= invoice.total) {
+            await queryOne('UPDATE invoices SET status = $1, updated_at = NOW() WHERE id = $2', ['paid', metadata.invoiceId]);
+          }
+
+          break;
+        }
+
+        const plan = metadata.plan || 'free';
         const customerId = session.customer || '';
         const userId = session.client_reference_id || '';
 

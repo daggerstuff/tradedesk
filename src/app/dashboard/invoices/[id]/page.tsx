@@ -119,6 +119,26 @@ export default function InvoiceDetailPage() {
     }
   };
 
+  const [payLoading, setPayLoading] = useState(false);
+  const [shareUrl, setShareUrl] = useState('');
+  const [copied, setCopied] = useState(false);
+
+  const handleShare = async () => {
+    setPayLoading(true);
+    const res = await fetch(`/api/invoices/${params.id}/share`, { method: 'POST' });
+    if (res.ok) {
+      const data = await res.json();
+      setShareUrl(data.url);
+    }
+    setPayLoading(false);
+  };
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(shareUrl);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   if (!invoice) return <div className="text-center py-12 text-gray-500">Loading...</div>;
 
   const balance = (invoice.total || 0) - totalPaid;
@@ -165,11 +185,26 @@ export default function InvoiceDetailPage() {
           ) : (
             <>
               <button onClick={() => setEditing(true)} className="px-4 py-2 border rounded-md text-gray-700 hover:bg-gray-50">Edit</button>
+              <button onClick={handleShare} disabled={payLoading} className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-500 disabled:opacity-50">
+                {payLoading ? '...' : 'Share Link'}
+              </button>
               <button onClick={handleDelete} className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">Delete</button>
             </>
           )}
         </div>
       </div>
+
+      {shareUrl && (
+        <div className="mb-4 rounded-lg bg-indigo-50 border border-indigo-200 p-4 flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium text-indigo-900">Shareable invoice link:</p>
+            <p className="text-sm text-indigo-700 mt-1 break-all">{shareUrl}</p>
+          </div>
+          <button onClick={handleCopyLink} className="ml-4 px-3 py-1 rounded bg-indigo-600 text-white text-sm hover:bg-indigo-500">
+            {copied ? 'Copied!' : 'Copy'}
+          </button>
+        </div>
+      )}
 
       <div className="bg-white rounded-lg shadow p-6 space-y-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
