@@ -1,0 +1,35 @@
+{
+  "expo": {
+    "name": "TradeDesk",
+    "slug": "tradedesk",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "cover",
+      "backgroundColor": "#0f172a"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.tradedesk.app",
+      "infoPlist": {
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        }
+      }
+    },
+    "android": {
+      "package": "com.tradedesk.app",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0f172a"
+      }
+    },
+    "scheme": "tradedesk",
+    "plugins": ["expo-router"],
+    "extra": {
+      "apiUrl": "https://tradedesk-mu-khaki.vercel.app/api"
+    }
+  }
+}
