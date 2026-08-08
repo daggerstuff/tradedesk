@@ -60,7 +60,6 @@ export default function InvoiceDetailPage() {
   const [payMethod, setPayMethod] = useState('cash');
   const [payDate, setPayDate] = useState(new Date().toISOString().split('T')[0]);
   const [payRef, setPayRef] = useState('');
-  const [payLoading, setPayLoading] = useState(false);
 
   useEffect(() => {
     fetch(`/api/invoices/${params.id}`)
