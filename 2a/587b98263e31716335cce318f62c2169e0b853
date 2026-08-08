@@ -1,0 +1,23 @@
+src/app/signup/page.tsx
+  s_03be98155c9f0c::t_ef061be8a6f822 36,38-40,50,53,78,91,105,112
+src/app/page.tsx
+  s_03be98155c9f0c::t_087b6eda6cd390 12-14,23-25,34-36,41,43-44,46-50,52,58,64,74,82-83,86,90,97-98,107,117-118,121,126
+src/app/login/page.tsx
+  s_03be98155c9f0c::t_7816d1d48f19c0 34,36-38,48,51,76,83
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "2a587b98263e31716335cce318f62c2169e0b853",
+  "prompts": {},
+  "sessions": {
+    "s_03be98155c9f0c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ses_022cc5a18ffeY19apSwRCYOgWe",
+        "model": "unknown"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
