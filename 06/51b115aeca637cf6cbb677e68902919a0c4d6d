@@ -1,0 +1,77 @@
+mobile/src/navigation/types.ts
+  s_03be98155c9f0c::t_bc271bbe17076c 1-23
+mobile/src/screens/JobDetailScreen.tsx
+  s_03be98155c9f0c::t_bdff78fd95d733 1-66
+mobile/src/screens/ComplianceScreen.tsx
+  s_03be98155c9f0c::t_8a52dd3753990e 1-67
+mobile/src/screens/SettingsScreen.tsx
+  s_03be98155c9f0c::t_c957502cc86ec8 1-48
+src/app/api/auth/me/route.ts
+  s_03be98155c9f0c::t_5d97513688c3ec 1,3,5-14
+src/app/api/auth/signup/route.ts
+  s_03be98155c9f0c::t_e3583987082502 1-4,7-13,15-22
+package-lock.json
+  ai_agent 12-13,19,1126-1131,1186-1194,1272-1280,1879-1893
+mobile/src/api/client.ts
+  s_03be98155c9f0c::t_9692aa5de1f383 1-58
+mobile/src/screens/QuotesScreen.tsx
+  s_03be98155c9f0c::t_4c3bd83c16b673 1-69
+mobile/src/screens/LoginScreen.tsx
+  s_03be98155c9f0c::t_4b75f471f55d3a 1-67
+mobile/src/screens/InvoiceDetailScreen.tsx
+  s_03be98155c9f0c::t_61581a08d2b37a 1-113
+mobile/app.json
+  s_03be98155c9f0c::t_3cec43ada26733 1-35
+mobile/package.json
+  s_03be98155c9f0c::t_dc3e3edfba3231 1-33
+mobile/src/screens/AddExpenseScreen.tsx
+  s_03be98155c9f0c::t_43fb84db7e18db 1-66
+mobile/src/screens/SignupScreen.tsx
+  s_03be98155c9f0c::t_8df5fc0e21216a 1-65
+src/app/api/auth/login/route.ts
+  s_03be98155c9f0c::t_fa9a32a3afd35d 1-21
+mobile/src/screens/InvoicesScreen.tsx
+  s_03be98155c9f0c::t_c483befba51d74 1-68
+mobile/src/screens/MoreMenuScreen.tsx
+  s_03be98155c9f0c::t_2aa7277880cc34 1-41
+mobile/src/screens/NewQuoteScreen.tsx
+  s_03be98155c9f0c::t_f0362cb31ad223 1-92
+mobile/src/navigation/AppStack.tsx
+  s_03be98155c9f0c::t_3e1a0b046e1b69 1-41
+mobile/src/App.tsx
+  s_03be98155c9f0c::t_98174687841677 1-44
+mobile/src/navigation/MoreStack.tsx
+  s_03be98155c9f0c::t_408c324fc93eca 1-40
+mobile/src/screens/DashboardScreen.tsx
+  s_03be98155c9f0c::t_9bee276fe3a91c 1-105
+mobile/src/screens/JobsScreen.tsx
+  s_03be98155c9f0c::t_1fa59e4b99558c 1-66
+mobile/src/screens/CustomersScreen.tsx
+  s_03be98155c9f0c::t_5f74247b98aac6 1-58
+mobile/tsconfig.json
+  s_03be98155c9f0c::t_ae7070dc59c5ad 1-13
+mobile/src/screens/QuoteDetailScreen.tsx
+  s_03be98155c9f0c::t_cd8ce5c115af8d 1-104
+mobile/src/screens/ReportsScreen.tsx
+  s_03be98155c9f0c::t_a777e7f7519825 1-68
+mobile/src/navigation/AuthStack.tsx
+  s_03be98155c9f0c::t_085a19d171fef8 1-20
+mobile/src/screens/ExpensesScreen.tsx
+  s_03be98155c9f0c::t_c117cadfa692c6 1-84
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "0651b115aeca637cf6cbb677e68902919a0c4d6d",
+  "prompts": {},
+  "sessions": {
+    "s_03be98155c9f0c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ses_022cc5a18ffeY19apSwRCYOgWe",
+        "model": "unknown"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
