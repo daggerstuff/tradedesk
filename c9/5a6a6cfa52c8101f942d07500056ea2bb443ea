@@ -1,0 +1,51 @@
+src/app/api/expenses/route.ts
+  s_03be98155c9f0c::t_33da763d100c39 1-45
+src/app/dashboard/quotes/new/page.tsx
+  s_03be98155c9f0c::t_999bf231ea1e75 1-151
+src/app/api/expenses/[id]/route.ts
+  s_03be98155c9f0c::t_36081d57a2ea21 1-36
+src/app/dashboard/page.tsx
+  s_03be98155c9f0c::t_6634d2c0270cd2 9-13,16-19,21-48,54-57,60-70,72-74,76-77,82,84-85,90-139,143-216
+src/app/api/quotes/[id]/route.ts
+  s_03be98155c9f0c::t_2b755da363bebf 1-83
+src/app/api/quotes/[id]/convert/route.ts
+  s_03be98155c9f0c::t_a5d555aa1c17f7 1-59
+src/app/dashboard/quotes/[id]/page.tsx
+  s_03be98155c9f0c::t_98e77a75424e74 1-259
+src/app/dashboard/reports/page.tsx
+  s_03be98155c9f0c::t_15c985128e3ddc 1-231
+src/app/api/invoices/[id]/payments/route.ts
+  s_03be98155c9f0c::t_15d46b05b03529 1-73
+src/app/dashboard/invoices/[id]/page.tsx
+  s_03be98155c9f0c::t_fdb1699bf2db9d 80-85
+  s_03be98155c9f0c::t_219c9661339ec9 32-39
+  s_03be98155c9f0c::t_6c04508c0e210c 260-327
+  s_03be98155c9f0c::t_1608204be86a54 124-146
+  s_03be98155c9f0c::t_e9cbb202ad1792 56-63
+src/app/dashboard/sidebar-nav.tsx
+  s_03be98155c9f0c::t_c262173f4b2091 9,11-12,15,32,49,51,66
+src/app/api/quotes/route.ts
+  s_03be98155c9f0c::t_8ae97c43971493 1-58
+src/app/dashboard/quotes/page.tsx
+  s_03be98155c9f0c::t_c7de4484378e2d 1-88
+src/app/dashboard/expenses/new/page.tsx
+  s_03be98155c9f0c::t_5d1ae5296a320f 1-83
+src/app/dashboard/expenses/page.tsx
+  s_03be98155c9f0c::t_7b498ab655de30 1-107
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "c95a6a6cfa52c8101f942d07500056ea2bb443ea",
+  "prompts": {},
+  "sessions": {
+    "s_03be98155c9f0c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ses_022cc5a18ffeY19apSwRCYOgWe",
+        "model": "unknown"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
