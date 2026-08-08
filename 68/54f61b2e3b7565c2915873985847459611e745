@@ -1,0 +1,42 @@
+src/app/pay/[token]/page.tsx
+  s_03be98155c9f0c::t_f941d0ec67d060 4-33,41,60,65,70
+src/app/api/push/register/route.ts
+  s_03be98155c9f0c::t_3e697e559a51d0 12
+src/app/api/auth/login/route.ts
+  s_03be98155c9f0c::t_c0cce5fdc7f778 11
+src/app/api/quotes/[id]/convert/route.ts
+  s_03be98155c9f0c::t_d921f20dab4145 46,51
+src/app/api/webhooks/stripe/route.ts
+  s_03be98155c9f0c::t_eca8621f77b913 31
+src/app/api/auth/me/route.ts
+  s_03be98155c9f0c::t_9c74e953206624 6,10
+src/app/api/cron/check-compliance/route.ts
+  s_03be98155c9f0c::t_fc074bdba845a5 11-13
+  s_03be98155c9f0c::t_a5c349488ecff0 28-29
+tsconfig.json
+  s_03be98155c9f0c::t_6bb0624f834991 33
+src/app/api/invoices/[id]/payments/route.ts
+  s_03be98155c9f0c::t_fc99faa921bedd 63-64
+  s_03be98155c9f0c::t_4c6165a00f1ba7 23-24,28-29
+src/app/api/jobs/[id]/invoice/route.ts
+  s_03be98155c9f0c::t_ccc0ffe93fe1bf 11
+src/app/api/stripe/invoice-checkout/route.ts
+  s_03be98155c9f0c::t_7591c5bb36793c 29-30
+  s_03be98155c9f0c::t_8cc733919ec8a2 27-28
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "6854f61b2e3b7565c2915873985847459611e745",
+  "prompts": {},
+  "sessions": {
+    "s_03be98155c9f0c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ses_022cc5a18ffeY19apSwRCYOgWe",
+        "model": "unknown"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
