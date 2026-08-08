@@ -1,0 +1,49 @@
+src/app/dashboard/field-service/new/page.tsx
+  s_03be98155c9f0c::t_8d5d21c9de5277 1-111
+vercel.json
+  s_03be98155c9f0c::t_1299e7ca89f315 6-9
+src/app/api/compliance-docs/[id]/route.ts
+  s_03be98155c9f0c::t_7a6be319de73ea 1-39
+src/app/api/customers/[id]/history/route.ts
+  s_03be98155c9f0c::t_5366e0dc608fcd 1-27
+src/app/api/cron/check-compliance/route.ts
+  s_03be98155c9f0c::t_8ef316eae36c29 1-42
+src/app/api/jobs/[id]/invoice/route.ts
+  s_03be98155c9f0c::t_2dd248a5a8d40a 1-32
+src/app/api/jobs/route.ts
+  s_03be98155c9f0c::t_7fd47bfa6aad62 1-31
+src/app/api/compliance-docs/route.ts
+  s_03be98155c9f0c::t_8746f7859bd8b9 1-34
+src/app/api/jobs/[id]/route.ts
+  s_03be98155c9f0c::t_40418aa78f325c 1-40
+src/app/dashboard/field-service/page.tsx
+  s_03be98155c9f0c::t_274c09d351e23b 1-99
+public/manifest.json
+  s_03be98155c9f0c::t_184c13c1116e49 1-10
+src/app/dashboard/field-service/customer-history/[customerId]/page.tsx
+  s_03be98155c9f0c::t_eb798fcc9ddb6c 1-76
+src/app/dashboard/compliance/new/page.tsx
+  s_03be98155c9f0c::t_0fb3735d88a071 1-102
+src/app/dashboard/compliance/page.tsx
+  s_03be98155c9f0c::t_f9dc5fe1d651c3 1-97
+src/app/dashboard/field-service/[id]/page.tsx
+  s_03be98155c9f0c::t_dc0587736bab8b 1-115
+src/app/layout.tsx
+  s_03be98155c9f0c::t_4041e63750e8ad 8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "1fc20586f96a5828eb7d093cef67585384c018a5",
+  "prompts": {},
+  "sessions": {
+    "s_03be98155c9f0c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ses_022cc5a18ffeY19apSwRCYOgWe",
+        "model": "unknown"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
