@@ -1,0 +1,33 @@
+src/app/api/webhooks/stripe/route.ts
+  s_03be98155c9f0c::t_fe6a2f9ae5b9c3 18-47
+src/lib/stripe.ts
+  s_03be98155c9f0c::t_5343668ead76bc 54-79
+src/app/pay/[token]/page.tsx
+  s_03be98155c9f0c::t_3126677891328e 1-54
+src/app/dashboard/invoices/[id]/page.tsx
+  s_03be98155c9f0c::t_c15611585571a7 197-208
+  s_03be98155c9f0c::t_fae196b2cbbb57 188-190
+  s_03be98155c9f0c::t_dd14a6e89bff6a 122-141
+src/app/pay/[token]/InvoicePayClient.tsx
+  s_03be98155c9f0c::t_81bfcf7b030a03 1-202
+src/app/api/stripe/invoice-checkout/route.ts
+  s_03be98155c9f0c::t_2a85c437769f55 1-40
+src/app/api/invoices/[id]/share/route.ts
+  s_03be98155c9f0c::t_f053f3d415bbd4 1-23
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "75badf5fb0058c95c3b73bd1638acce249588f33",
+  "prompts": {},
+  "sessions": {
+    "s_03be98155c9f0c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ses_022cc5a18ffeY19apSwRCYOgWe",
+        "model": "unknown"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
