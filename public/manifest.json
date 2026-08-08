@@ -1,0 +1,10 @@
+{
+  "name": "TradeDesk Field Service",
+  "short_name": "TradeDesk",
+  "description": "Field service management for small businesses",
+  "start_url": "/dashboard/field-service",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "icons": []
+}
