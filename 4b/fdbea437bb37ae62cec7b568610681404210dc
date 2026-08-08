@@ -1,0 +1,23 @@
+src/app/api/jobs/[id]/photos/[photoId]/route.ts
+  s_03be98155c9f0c::t_48cb32d15bce34 36,38,53
+  s_03be98155c9f0c::t_e0de97c87f1a8b 8,10,26
+src/app/api/jobs/[id]/photos/route.ts
+  s_03be98155c9f0c::t_9b941d6a4fc26e 8,10,29,37,39
+  s_03be98155c9f0c::t_75ecc82d54375e 65
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "4bfdbea437bb37ae62cec7b568610681404210dc",
+  "prompts": {},
+  "sessions": {
+    "s_03be98155c9f0c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ses_022cc5a18ffeY19apSwRCYOgWe",
+        "model": "unknown"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
