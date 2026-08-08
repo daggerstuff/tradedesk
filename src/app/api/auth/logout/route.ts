@@ -4,7 +4,6 @@ import { clearSessionCookie } from "@/lib/session"
 export const runtime = "nodejs"
 
 export async function POST() {
-  const res = NextResponse.json({ success: true })
-  clearSessionCookie(res)
-  return res
+  await clearSessionCookie()
+  return NextResponse.json({ success: true })
 }

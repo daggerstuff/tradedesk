@@ -49,10 +49,8 @@ export async function GET(req: NextRequest) {
     })
 
     // Set cookie and redirect to dashboard
-    const res = NextResponse.redirect(new URL("/dashboard", process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"))
-    setSessionCookie(res, jwt)
-
-    return res
+    await setSessionCookie(jwt)
+    return NextResponse.redirect(new URL("/dashboard", process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"))
   } catch (error) {
     console.error("Verify error:", error)
     return NextResponse.redirect(new URL("/login?error=server-error", process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"))

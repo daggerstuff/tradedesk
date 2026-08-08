@@ -2,6 +2,22 @@ import { NextRequest, NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { sendEmail } from '@/lib/resend';
 
+interface ReminderRow {
+  invoice_id: string;
+  invoice_number: string;
+  total: string;
+  due_date: string;
+  issue_date: string;
+  user_id: string;
+  customer_name: string;
+  customer_email: string;
+  template_id: string;
+  subject: string;
+  body: string;
+  template_name: string;
+  user_email: string;
+}
+
 export async function GET(req: NextRequest) {
   const authHeader = req.headers.get('authorization');
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
@@ -9,7 +25,7 @@ export async function GET(req: NextRequest) {
   }
 
   // Find invoices that need reminders based on active templates
-  const reminders = await query(
+  const reminders = await query<ReminderRow>(
     `SELECT i.id as invoice_id, i.invoice_number, i.total, i.due_date, i.issue_date,
             i.user_id, c.name as customer_name, c.email as customer_email,
             t.id as template_id, t.subject, t.body, t.name as template_name,

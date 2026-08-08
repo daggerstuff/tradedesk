@@ -190,8 +190,8 @@ export default function InvoiceDetailPage() {
                 <tr key={idx} className="border-b">
                   <td className="py-2">{item.description}</td>
                   <td className="py-2 text-right">{item.quantity}</td>
-                  <td className="py-2 text-right">${item.unitPrice?.toFixed(2)}</td>
-                  <td className="py-2 text-right">${(item.quantity * item.unitPrice).toFixed(2)}</td>
+                  <td className="py-2 text-right">${item.unit_price?.toFixed(2)}</td>
+                  <td className="py-2 text-right">${(item.quantity * item.unit_price).toFixed(2)}</td>
                 </tr>
               ))}
             </tbody>

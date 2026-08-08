@@ -27,7 +27,7 @@ export async function setSessionCookie(token: string) {
   });
 }
 
-export function clearSessionCookie() {
-  const cookieStore = cookies();
+export async function clearSessionCookie() {
+  const cookieStore = await cookies();
   cookieStore.delete(COOKIE_NAME);
 }
