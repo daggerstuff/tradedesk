@@ -9,7 +9,9 @@ export default function LandingPage() {
       features: ["Customer management", "Invoice tracking", "Automated email reminders", "Payment status dashboard"],
       href: "/signup",
       cta: "Start free trial",
-      accent: "from-indigo-500 to-blue-500",
+      accentColor: "text-indigo-600",
+      checkBg: "bg-indigo-600",
+      btnHover: "group-hover:bg-indigo-600",
     },
     {
       name: "Compliance Tracking",
@@ -18,7 +20,9 @@ export default function LandingPage() {
       features: ["PDF document upload", "AI-powered expiry extraction", "Expiry reminders", "Compliance dashboard"],
       href: "/signup",
       cta: "Start free trial",
-      accent: "from-purple-500 to-pink-500",
+      accentColor: "text-purple-600",
+      checkBg: "bg-purple-600",
+      btnHover: "group-hover:bg-purple-600",
     },
     {
       name: "Field Service",
@@ -27,42 +31,37 @@ export default function LandingPage() {
       features: ["Mobile-first PWA", "Estimate creation", "Invoice management", "Customer history"],
       href: "/signup",
       cta: "Start free trial",
-      accent: "from-emerald-500 to-teal-500",
+      accentColor: "text-emerald-600",
+      checkBg: "bg-emerald-600",
+      btnHover: "group-hover:bg-emerald-600",
     },
   ]
 
   return (
-    <div className="bg-slate-50">
+    <div className="bg-white">
       {/* Hero */}
-      <section className="relative overflow-hidden">
-        {/* Gradient mesh background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 via-white to-purple-50" />
-        <div className="absolute top-0 left-1/4 h-72 w-72 rounded-full bg-indigo-300/30 blur-3xl" />
-        <div className="absolute top-20 right-1/4 h-72 w-72 rounded-full bg-purple-300/30 blur-3xl" />
-
-        <div className="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-32">
+      <section className="border-b border-gray-100 bg-slate-900">
+        <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
           <div className="mx-auto max-w-3xl text-center">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-white/60 px-4 py-1.5 text-sm font-medium text-indigo-700 backdrop-blur-sm">
-              <span className="flex h-2 w-2 rounded-full bg-indigo-500 animate-pulse" />
-              Trusted by 500+ small businesses
-            </div>
-            <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl lg:text-6xl">
-              Business tools that <span className="gradient-text">work as hard</span> as you do
+            <p className="mb-4 text-sm font-semibold uppercase tracking-wider text-indigo-400">
+              Built for trades & small business
+            </p>
+            <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl">
+              Business tools that work as hard as you do
             </h1>
-            <p className="mt-6 text-lg text-gray-600 sm:text-xl">
+            <p className="mt-6 text-lg text-slate-300 sm:text-xl">
               Invoice reminders, compliance tracking, and field service management — all in one place.
-              Built for small businesses and trades.
             </p>
             <div className="mt-10 flex items-center justify-center gap-4">
               <Link
                 href="/signup"
-                className="rounded-xl bg-indigo-600 px-8 py-3.5 text-base font-semibold text-white shadow-lg shadow-indigo-600/30 transition-all hover:bg-indigo-700 hover:shadow-xl hover:shadow-indigo-600/40 hover:-translate-y-0.5"
+                className="rounded-lg bg-indigo-600 px-8 py-3.5 text-base font-semibold text-white transition-colors hover:bg-indigo-500"
               >
                 Get started free
               </Link>
               <Link
                 href="/login"
-                className="rounded-xl border border-gray-300 bg-white/80 px-8 py-3.5 text-base font-semibold text-gray-700 backdrop-blur-sm transition-all hover:bg-white hover:border-gray-400 hover:-translate-y-0.5"
+                className="rounded-lg border border-slate-600 px-8 py-3.5 text-base font-semibold text-slate-200 transition-colors hover:border-slate-400 hover:text-white"
               >
                 Sign in
               </Link>
@@ -72,7 +71,7 @@ export default function LandingPage() {
       </section>
 
       {/* Features */}
-      <section className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
+      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl">Simple, powerful tools</h2>
           <p className="mt-4 text-lg text-gray-600">
@@ -80,27 +79,23 @@ export default function LandingPage() {
           </p>
         </div>
 
-        <div className="mt-16 grid grid-cols-1 gap-8 lg:grid-cols-3">
-          {features.map((feature, idx) => (
+        <div className="mt-16 grid grid-cols-1 gap-6 lg:grid-cols-3">
+          {features.map((feature) => (
             <div
               key={feature.name}
-              className="group flex flex-col rounded-2xl border border-gray-200 bg-white p-8 shadow-sm transition-all duration-300 hover:shadow-xl hover:shadow-gray-200/60 hover:-translate-y-1"
-              style={{ animationDelay: `${idx * 100}ms` }}
+              className="group flex flex-col rounded-xl border border-gray-200 bg-white p-8 transition-all duration-200 hover:border-gray-300 hover:shadow-lg"
             >
-              {/* Gradient accent bar */}
-              <div className={`mb-6 h-1.5 w-12 rounded-full bg-gradient-to-r ${feature.accent} group-hover:w-20 transition-all duration-300`} />
-
               <div className="flex items-center justify-between">
                 <h3 className="text-xl font-bold text-gray-900">{feature.name}</h3>
-                <span className="rounded-full bg-gray-100 px-3 py-1 text-sm font-semibold text-gray-700">
+                <span className={`text-lg font-bold ${feature.accentColor}`}>
                   {feature.price}
                 </span>
               </div>
               <p className="mt-4 text-gray-600">{feature.description}</p>
               <ul className="mt-6 space-y-3 flex-1">
                 {feature.features.map((item) => (
-                  <li key={item} className="flex items-center gap-2 text-sm text-gray-700">
-                    <svg className={`h-5 w-5 flex-none bg-gradient-to-br ${feature.accent} rounded-full p-0.5 text-white`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <li key={item} className="flex items-center gap-2.5 text-sm text-gray-700">
+                    <svg className={`h-4 w-4 flex-none ${feature.checkBg} rounded-full p-0.5 text-white`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                     </svg>
                     {item}
@@ -109,7 +104,7 @@ export default function LandingPage() {
               </ul>
               <Link
                 href={feature.href}
-                className="mt-8 w-full rounded-xl bg-gray-900 py-2.5 text-center text-sm font-semibold text-white transition-all hover:bg-gray-800 group-hover:bg-indigo-600"
+                className={`mt-8 w-full rounded-lg bg-gray-900 py-2.5 text-center text-sm font-semibold text-white transition-colors hover:bg-gray-800 ${feature.btnHover}`}
               >
                 {feature.cta}
               </Link>
@@ -119,18 +114,16 @@ export default function LandingPage() {
       </section>
 
       {/* CTA */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-indigo-600 via-indigo-700 to-purple-700">
-        <div className="absolute top-0 right-0 h-64 w-64 rounded-full bg-white/10 blur-3xl" />
-        <div className="absolute bottom-0 left-0 h-64 w-64 rounded-full bg-purple-400/20 blur-3xl" />
-        <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
+      <section className="bg-slate-900">
+        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
           <div className="text-center">
             <h2 className="text-3xl font-bold text-white sm:text-4xl">Ready to get started?</h2>
-            <p className="mt-4 text-lg text-indigo-100">
+            <p className="mt-4 text-lg text-slate-400">
               Sign up in seconds. No credit card required.
             </p>
             <Link
               href="/signup"
-              className="mt-8 inline-block rounded-xl bg-white px-8 py-3.5 text-base font-semibold text-indigo-600 shadow-lg transition-all hover:bg-indigo-50 hover:shadow-xl hover:-translate-y-0.5"
+              className="mt-8 inline-block rounded-lg bg-indigo-600 px-8 py-3.5 text-base font-semibold text-white transition-colors hover:bg-indigo-500"
             >
               Create your account
             </Link>
