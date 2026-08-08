@@ -6,71 +6,214 @@ export default async function DashboardOverview() {
   const session = await getSession()
   if (!session) return null
 
-  // Get subscription
-  const subscription = await queryOne<{ plan: string; status: string }>(
-    "SELECT plan, status FROM subscriptions WHERE user_id = $1 AND status = 'active' ORDER BY created_at DESC LIMIT 1",
-    [session.userId]
-  )
-
-  // Get stats
-  const [customerCount, invoiceCount, pendingReminders] = await Promise.all([
+  // Parallel fetch all stats
+  const [
+    customerCount, invoiceCount, outstandingAR, activeJobs,
+    upcomingExpiries, monthlyRevenue, recentInvoices, recentJobs
+  ] = await Promise.all([
     queryOne<{ count: string }>("SELECT COUNT(*) as count FROM customers WHERE user_id = $1", [session.userId]),
     queryOne<{ count: string }>("SELECT COUNT(*) as count FROM invoices WHERE user_id = $1", [session.userId]),
+    queryOne<{ total: string | null }>(
+      `SELECT COALESCE(SUM(total), 0) as total FROM invoices WHERE user_id = $1 AND status IN ('sent', 'overdue')`,
+      [session.userId]
+    ),
     queryOne<{ count: string }>(
-      "SELECT COUNT(*) as count FROM reminders r JOIN invoices i ON r.invoice_id = i.id WHERE i.user_id = $1 AND r.status IN ('pending', 'sent')",
+      `SELECT COUNT(*) as count FROM jobs WHERE user_id = $1 AND status IN ('scheduled', 'in_progress')`,
+      [session.userId]
+    ),
+    queryMany<{ id: string; doc_name: string; expiry_date: string; customer_name: string }>(
+      `SELECT cd.id, cd.doc_name, cd.expiry_date::text, c.name as customer_name
+       FROM compliance_docs cd LEFT JOIN customers c ON cd.customer_id = c.id
+       WHERE cd.user_id = $1 AND cd.expiry_date <= NOW() + INTERVAL '30 days'
+       ORDER BY cd.expiry_date ASC LIMIT 5`,
+      [session.userId]
+    ),
+    queryMany<{ month: string; revenue: string }>(
+      `SELECT TO_CHAR(issue_date, 'Mon') as month, SUM(total) as revenue
+       FROM invoices WHERE user_id = $1 AND status = 'paid'
+       AND issue_date >= date_trunc('month', NOW()) - INTERVAL '5 months'
+       GROUP BY 1, date_trunc('month', issue_date)
+       ORDER BY date_trunc('month', issue_date) DESC LIMIT 6`,
+      [session.userId]
+    ),
+    queryMany<{ id: string; invoice_number: string; customer_name: string; total: string; status: string }>(
+      `SELECT i.id, i.invoice_number, c.name as customer_name, i.total::text, i.status
+       FROM invoices i JOIN customers c ON i.customer_id = c.id
+       WHERE i.user_id = $1 ORDER BY i.created_at DESC LIMIT 5`,
+      [session.userId]
+    ),
+    queryMany<{ id: string; title: string; customer_name: string; status: string; scheduled_date: string }>(
+      `SELECT j.id, j.title, c.name as customer_name, j.status, j.scheduled_date::text
+       FROM jobs j LEFT JOIN customers c ON j.customer_id = c.id
+       WHERE j.user_id = $1 ORDER BY j.created_at DESC LIMIT 5`,
       [session.userId]
     ),
   ])
 
   const stats = [
-    { label: "Customers", value: customerCount?.count || "0", href: "/dashboard/customers", color: "bg-blue-50 text-blue-700" },
-    { label: "Invoices", value: invoiceCount?.count || "0", href: "/dashboard/invoices", color: "bg-green-50 text-green-700" },
-    { label: "Pending Reminders", value: pendingReminders?.count || "0", href: "/dashboard/reminders", color: "bg-amber-50 text-amber-700" },
-    { label: "Plan", value: subscription?.plan || "free", href: "/dashboard/settings", color: "bg-purple-50 text-purple-700" },
+    { label: "Customers", value: customerCount?.count || "0", href: "/dashboard/customers" },
+    { label: "Invoices", value: invoiceCount?.count || "0", href: "/dashboard/invoices" },
+    { label: "Outstanding A/R", value: `$${parseFloat(outstandingAR?.total || "0").toFixed(0)}`, href: "/dashboard/invoices" },
+    { label: "Active Jobs", value: activeJobs?.count || "0", href: "/dashboard/field-service" },
   ]
 
-  return (
-    <div className="p-8">
-      <h1 className="mb-2 text-2xl font-bold text-gray-900">Dashboard</h1>
-      <p className="mb-8 text-gray-600">Welcome back. Here&apos;s your overview.</p>
+  const statusColors: Record<string, string> = {
+    draft: "bg-gray-100 text-gray-700",
+    sent: "bg-blue-100 text-blue-700",
+    paid: "bg-green-100 text-green-700",
+    overdue: "bg-red-100 text-red-700",
+    cancelled: "bg-gray-100 text-gray-500",
+  }
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+  // Simple CSS bar chart from monthly revenue
+  const maxRevenue = Math.max(...monthlyRevenue.map(r => parseFloat(r.revenue || "0")), 1)
+
+  return (
+    <div className="p-8 max-w-7xl mx-auto">
+      <h1 className="text-2xl font-bold text-gray-900">Overview</h1>
+      <p className="text-gray-600 mt-1">Your business at a glance.</p>
+
+      {/* Stat cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
         {stats.map((stat) => (
           <Link
             key={stat.label}
             href={stat.href}
-            className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow"
+            className="rounded-lg border border-gray-200 bg-white p-5 hover:border-gray-300 transition-colors"
           >
-            <div className={`inline-flex rounded-md px-2 py-1 text-xs font-medium ${stat.color}`}>
-              {stat.label}
-            </div>
-            <p className="mt-3 text-3xl font-bold text-gray-900">{stat.value}</p>
+            <p className="text-sm font-medium text-gray-500">{stat.label}</p>
+            <p className="text-2xl font-bold text-gray-900 mt-2">{stat.value}</p>
           </Link>
         ))}
       </div>
 
-      <div className="mt-8 rounded-lg border border-gray-200 bg-white p-6">
-        <h2 className="mb-4 text-lg font-semibold text-gray-900">Quick Actions</h2>
-        <div className="flex flex-wrap gap-3">
-          <Link
-            href="/dashboard/customers/new"
-            className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
-          >
-            + Add Customer
-          </Link>
-          <Link
-            href="/dashboard/invoices/new"
-            className="rounded-md bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200"
-          >
-            + Create Invoice
-          </Link>
-          <Link
-            href="/pricing"
-            className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-          >
-            Upgrade Plan
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+        {/* Revenue chart */}
+        <div className="lg:col-span-2 rounded-lg border border-gray-200 bg-white p-6">
+          <h2 className="text-lg font-semibold text-gray-900">Revenue (Last 6 Months)</h2>
+          <div className="flex items-end gap-4 h-48 mt-6">
+            {monthlyRevenue.length === 0 ? (
+              <p className="text-gray-400 text-sm">No paid invoices yet.</p>
+            ) : (
+              monthlyRevenue.reverse().map((r) => (
+                <div key={r.month} className="flex-1 flex flex-col items-center gap-2">
+                  <div className="w-full flex items-end h-36">
+                    <div
+                      className="w-full bg-indigo-600 rounded-t transition-all"
+                      style={{ height: `${(parseFloat(r.revenue || "0") / maxRevenue) * 100}%` }}
+                    />
+                  </div>
+                  <span className="text-xs text-gray-500">{r.month}</span>
+                  <span className="text-xs font-medium text-gray-700">${parseFloat(r.revenue || "0").toFixed(0)}</span>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
+        {/* Upcoming compliance expiries */}
+        <div className="rounded-lg border border-gray-200 bg-white p-6">
+          <h2 className="text-lg font-semibold text-gray-900">Expiring Soon</h2>
+          {upcomingExpiries.length === 0 ? (
+            <p className="text-gray-400 text-sm mt-4">Nothing expiring in 30 days.</p>
+          ) : (
+            <ul className="mt-4 space-y-3">
+              {upcomingExpiries.map((doc) => {
+                const days = Math.ceil((new Date(doc.expiry_date).getTime() - Date.now()) / 86400000)
+                const urgent = days <= 7
+                return (
+                  <li key={doc.id} className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">{doc.doc_name}</p>
+                      <p className="text-xs text-gray-500">{doc.customer_name || "—"}</p>
+                    </div>
+                    <span className={`text-xs font-medium px-2 py-1 rounded ${urgent ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-700"}`}>
+                      {days <= 0 ? "Expired" : `${days}d`}
+                    </span>
+                  </li>
+                )
+              })}
+            </ul>
+          )}
+          <Link href="/dashboard/compliance" className="block mt-4 text-sm text-indigo-600 hover:text-indigo-500">
+            View all compliance →
           </Link>
         </div>
+      </div>
+
+      {/* Recent activity */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+        {/* Recent invoices */}
+        <div className="rounded-lg border border-gray-200 bg-white p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-gray-900">Recent Invoices</h2>
+            <Link href="/dashboard/invoices" className="text-sm text-indigo-600 hover:text-indigo-500">View all →</Link>
+          </div>
+          {recentInvoices.length === 0 ? (
+            <p className="text-gray-400 text-sm">No invoices yet.</p>
+          ) : (
+            <ul className="space-y-3">
+              {recentInvoices.map((inv) => (
+                <li key={inv.id} className="flex items-center justify-between">
+                  <Link href={`/dashboard/invoices/${inv.id}`} className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                    {inv.invoice_number}
+                  </Link>
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm text-gray-600">{inv.customer_name}</span>
+                    <span className="text-sm font-medium text-gray-900">${parseFloat(inv.total).toFixed(0)}</span>
+                    <span className={`text-xs px-2 py-0.5 rounded ${statusColors[inv.status] || "bg-gray-100"}`}>
+                      {inv.status}
+                    </span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        {/* Recent jobs */}
+        <div className="rounded-lg border border-gray-200 bg-white p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-gray-900">Recent Jobs</h2>
+            <Link href="/dashboard/field-service" className="text-sm text-indigo-600 hover:text-indigo-500">View all →</Link>
+          </div>
+          {recentJobs.length === 0 ? (
+            <p className="text-gray-400 text-sm">No jobs yet.</p>
+          ) : (
+            <ul className="space-y-3">
+              {recentJobs.map((job) => (
+                <li key={job.id} className="flex items-center justify-between">
+                  <Link href={`/dashboard/field-service/${job.id}`} className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                    {job.title}
+                  </Link>
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm text-gray-600">{job.customer_name || "—"}</span>
+                    <span className="text-xs px-2 py-0.5 rounded bg-gray-100 text-gray-700">{job.status}</span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </div>
+
+      {/* Quick actions */}
+      <div className="mt-6 flex flex-wrap gap-3">
+        <Link href="/dashboard/invoices/new" className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500 transition-colors">
+          + New Invoice
+        </Link>
+        <Link href="/dashboard/quotes/new" className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+          + New Quote
+        </Link>
+        <Link href="/dashboard/expenses/new" className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+          + Add Expense
+        </Link>
+        <Link href="/dashboard/field-service/new" className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+          + New Job
+        </Link>
+        <Link href="/dashboard/compliance/new" className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+          + Upload Compliance Doc
+        </Link>
       </div>
     </div>
   )
