@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { query, queryOne } from '@/lib/db';
 import { getSession } from '@/lib/session';
 import { generateId } from '@/lib/auth';
+import { sendPushNotification } from '@/lib/push';
 
 export async function GET(
   _req: NextRequest,
@@ -68,6 +69,18 @@ export async function POST(
   } else if (invoice.status === 'draft') {
     await query(`UPDATE invoices SET status = 'sent' WHERE id = $1`, [id]);
   }
+
+  const invoiceInfo = await queryOne<{ invoice_number: string; customer_name: string }>(
+    `SELECT i.invoice_number, c.name as customer_name FROM invoices i LEFT JOIN customers c ON i.customer_id = c.id WHERE i.id = $1`,
+    [id]
+  );
+
+  await sendPushNotification(
+    session.userId,
+    'Payment Received',
+    `$${parseFloat(amount).toFixed(2)} for Invoice #${invoiceInfo?.invoice_number || id} from ${invoiceInfo?.customer_name || 'customer'}`,
+    { type: 'payment', invoiceId: id, amount: String(amount) }
+  );
 
   return NextResponse.json({ payment: { id: paymentId }, totalPaid }, { status: 201 });
 }

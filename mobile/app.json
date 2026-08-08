@@ -24,10 +24,12 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#0f172a"
-      }
+      },
+      "googleServicesFile": "./google-services.json",
+      "useNextNotificationsApi": true
     },
     "scheme": "tradedesk",
-    "plugins": ["expo-router"],
+    "plugins": ["expo-router", "expo-notifications"],
     "extra": {
       "eas": {
         "projectId": ""

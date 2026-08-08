@@ -29,7 +29,10 @@
     "@expo/vector-icons": "^14.0.0",
     "react-native-gesture-handler": "~2.24.0",
     "react-native-reanimated": "~3.17.0",
-    "expo-dev-client": "~5.2.0"
+    "expo-dev-client": "~5.2.0",
+    "expo-notifications": "~0.31.0",
+    "expo-device": "~7.1.0",
+    "expo-constants": "~17.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.25.0",

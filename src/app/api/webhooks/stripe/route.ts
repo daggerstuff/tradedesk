@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { constructWebhookEvent } from '@/lib/stripe';
 import { query, queryOne } from '@/lib/db';
+import { sendPushNotification } from '@/lib/push';
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
@@ -36,9 +37,21 @@ export async function POST(req: NextRequest) {
           );
           const totalPaid = totalPaidResult?.total_paid || 0;
 
-          const invoice = await queryOne('SELECT total FROM invoices WHERE id = $1', [metadata.invoiceId]);
+          const invoice = await queryOne<{ total: string; user_id: string; invoice_number: string }>(
+            'SELECT total, user_id, invoice_number FROM invoices WHERE id = $1',
+            [metadata.invoiceId]
+          );
           if (invoice && totalPaid >= invoice.total) {
             await queryOne('UPDATE invoices SET status = $1, updated_at = NOW() WHERE id = $2', ['paid', metadata.invoiceId]);
+          }
+
+          if (invoice?.user_id) {
+            await sendPushNotification(
+              invoice.user_id,
+              'Stripe Payment Received',
+              `$${amountReceived.toFixed(2)} for Invoice #${invoice.invoice_number}`,
+              { type: 'stripe_payment', invoiceId: metadata.invoiceId }
+            );
           }
 
           break;

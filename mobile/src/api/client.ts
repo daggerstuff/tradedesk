@@ -5,6 +5,52 @@ const PROD_API = 'https://tradedesk-mu-khaki.vercel.app/api';
 
 export const API_BASE = __DEV__ ? DEV_API : PROD_API;
 
+/**
+ * Register for Expo push notifications.
+ * Called after successful auth.
+ * Gets the Expo push token and registers it with the backend.
+ */
+export async function registerForPushNotifications(): Promise<void> {
+  if (Platform.OS === 'web') return;
+
+  try {
+    const Device = await import('expo-device');
+    if (!Device.isDevice) return;
+
+    const Notifications = await import('expo-notifications');
+
+    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+    if (existingStatus !== 'granted') {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+    if (finalStatus !== 'granted') return;
+
+    const tokenData = await Notifications.getExpoPushTokenAsync({
+      projectId: 'tradedesk',
+    });
+    const pushToken = tokenData.data;
+
+    await apiFetch('/push/register', {
+      method: 'POST',
+      body: JSON.stringify({ token: pushToken }),
+    });
+  } catch (err) {
+    console.warn('[push] registration failed:', err);
+  }
+}
+
+/**
+ * Unregister push notifications (called on logout).
+ */
+export async function unregisterPushNotifications(): Promise<void> {
+  if (Platform.OS === 'web') return;
+  try {
+    await apiFetch('/push/register', { method: 'DELETE' });
+  } catch {}
+}
+
 export async function apiFetch(path: string, options: RequestInit = {}) {
   const token = await getToken();
   const res = await fetch(`${API_BASE}${path}`, {
