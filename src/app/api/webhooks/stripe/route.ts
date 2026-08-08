@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
             `INSERT INTO payments (id, invoice_id, amount, method, date, reference)
              VALUES (gen_random_uuid(), $1, $2, $3, NOW(), $4)
              ON CONFLICT DO NOTHING`,
-            [metadata.invoiceId, amountReceived, paymentMethod, session.id || 'stripe']
+            [metadata.invoiceId, amountReceived, paymentMethod, (session as { id?: string }).id || 'stripe']
           );
 
           const totalPaidResult = await queryOne(

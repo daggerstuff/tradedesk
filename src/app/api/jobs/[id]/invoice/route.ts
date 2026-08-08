@@ -8,7 +8,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   const { id } = await params
 
-  const job = await queryOne(`SELECT * FROM jobs WHERE id = $1 AND user_id = $2`, [id, session.userId])
+  const job = await queryOne<{ customer_id: string; final_amount: string | null; estimate_amount: string | null; title: string }>(`SELECT * FROM jobs WHERE id = $1 AND user_id = $2`, [id, session.userId])
   if (!job) return NextResponse.json({ error: "Job not found" }, { status: 404 })
 
   const invoiceId = generateId("inv")

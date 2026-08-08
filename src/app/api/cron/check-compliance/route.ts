@@ -8,7 +8,9 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
-  const expiring = await queryMany(
+  const expiring = await queryMany<{
+    expiry_date: string; doc_name: string; user_id: string; id: string; email: string; user_name: string;
+  }>(
     `SELECT cd.*, u.email, u.name as user_name
      FROM compliance_docs cd
      JOIN users u ON cd.user_id = u.id
@@ -23,8 +25,8 @@ export async function GET(request: Request) {
 
   let sent = 0
   for (const doc of expiring) {
-    const daysUntil = Math.ceil((new Date(doc.expiry_date).getTime() - Date.now()) / 86400000)
-    const html = complianceReminderEmail(doc.user_name || "there", doc.doc_name, new Date(doc.expiry_date).toLocaleDateString())
+    const daysUntil = Math.ceil((new Date(String(doc.expiry_date)).getTime() - Date.now()) / 86400000)
+    const html = complianceReminderEmail(doc.user_name || "there", doc.doc_name, new Date(String(doc.expiry_date)).toLocaleDateString())
     const subject = `Compliance reminder: ${doc.doc_name} expires in ${daysUntil} days`
 
     await sendEmail({ to: doc.email, subject, html })

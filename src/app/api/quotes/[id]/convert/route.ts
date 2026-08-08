@@ -43,12 +43,12 @@ export async function POST(
     [id]
   );
 
-  for (const item of quoteItems) {
+  for (const item of quoteItems as Array<Record<string, unknown>>) {
     const itemId = generateId('invitem');
     await query(
       `INSERT INTO invoice_items (id, invoice_id, description, quantity, unit_price, total)
        VALUES ($1, $2, $3, $4, $5, $6)`,
-      [itemId, invoiceId, item.description, item.quantity, item.unit_price, item.total]
+      [itemId, invoiceId, String(item.description), Number(item.quantity), Number(item.unit_price), Number(item.total)]
     );
   }
 

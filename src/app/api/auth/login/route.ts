@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
   if (!email || !password) {
     return NextResponse.json({ error: 'Email and password required' }, { status: 400 });
   }
-  const user = await queryOne('SELECT id, email, name, password FROM users WHERE email = $1', [email]);
+  const user = await queryOne<{ id: string; email: string; name: string; password: string }>('SELECT id, email, name, password FROM users WHERE email = $1', [email]);
   if (!user || !user.password) {
     return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
   }

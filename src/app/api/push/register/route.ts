@@ -9,7 +9,7 @@ async function getUserIdFromRequest(req: NextRequest): Promise<string | null> {
   const authHeader = req.headers.get('authorization');
   if (authHeader?.startsWith('Bearer ')) {
     const token = authHeader.slice(7);
-    const payload = verifyToken(token);
+    const payload = await verifyToken(token);
     return payload?.userId ?? null;
   }
   // Fall back to cookie session (web)

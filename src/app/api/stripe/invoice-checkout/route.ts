@@ -24,10 +24,10 @@ export async function POST(req: NextRequest) {
 
   try {
     const checkoutSession = await createInvoiceCheckoutSession(
-      invoice.id,
-      invoice.total,
-      invoice.customer_email || '',
-      invoice.customer_name || '',
+      String(invoice.id),
+      Number(invoice.total),
+      String(invoice.customer_email || ''),
+      String(invoice.customer_name || ''),
       successUrl,
       cancelUrl
     );

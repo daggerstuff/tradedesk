@@ -20,13 +20,13 @@ export async function GET(
   );
   if (!invoice) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
-  const payments = await query(
-    `SELECT * FROM payments WHERE invoice_id = $1 ORDER BY date DESC`,
+  const payments = await query<{ amount: string }>(
+    `SELECT amount FROM payments WHERE invoice_id = $1 ORDER BY date DESC`,
     [id]
   );
 
-  const totalPaid = payments.reduce((sum: number, p: { amount: string | number }) =>
-    sum + parseFloat(String(p.amount)), 0);
+  const totalPaid = payments.reduce((sum, p) =>
+    sum + parseFloat(p.amount), 0);
 
   return NextResponse.json({ payments, totalPaid, invoiceTotal: invoice.total });
 }
@@ -60,8 +60,8 @@ export async function POST(
   );
 
   // Check if invoice is now fully paid
-  const payments = await query(`SELECT amount FROM payments WHERE invoice_id = $1`, [id]);
-  const totalPaid = payments.reduce((sum: number, p: { amount: string }) =>
+  const payments = await query<{ amount: string }>(`SELECT amount FROM payments WHERE invoice_id = $1`, [id]);
+  const totalPaid = payments.reduce((sum, p) =>
     sum + parseFloat(p.amount), 0);
 
   if (parseFloat(totalPaid.toString()) >= parseFloat(invoice.total)) {
