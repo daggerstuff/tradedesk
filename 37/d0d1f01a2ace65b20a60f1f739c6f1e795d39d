@@ -1,0 +1,24 @@
+mobile/eas.json
+  s_03be98155c9f0c::t_7033b5c7c9577d 1-58
+mobile/package.json
+  s_03be98155c9f0c::t_4cb06ed5bada96 9-15
+  s_03be98155c9f0c::t_91ffc35c6db930 31-32,37-38
+mobile/app.json
+  s_03be98155c9f0c::t_cb7da20b8ee88c 32-34
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "37d0d1f01a2ace65b20a60f1f739c6f1e795d39d",
+  "prompts": {},
+  "sessions": {
+    "s_03be98155c9f0c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ses_022cc5a18ffeY19apSwRCYOgWe",
+        "model": "unknown"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
