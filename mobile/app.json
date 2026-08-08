@@ -29,7 +29,7 @@
       "useNextNotificationsApi": true
     },
     "scheme": "tradedesk",
-    "plugins": ["expo-router", "expo-notifications"],
+    "plugins": ["expo-router", "expo-notifications", "expo-image-picker"],
     "extra": {
       "eas": {
         "projectId": ""

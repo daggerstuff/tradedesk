@@ -10,17 +10,38 @@ interface Job {
   estimate_amount: string | null; final_amount: string | null; notes: string;
 }
 
+interface Photo {
+  id: string; caption: string | null; created_at: string; photo_preview: string; photo_size: number;
+}
+
 export default function JobDetailPage() {
   const params = useParams()
   const router = useRouter()
   const [job, setJob] = useState<Job | null>(null)
   const [saving, setSaving] = useState(false)
+  const [photos, setPhotos] = useState<Photo[]>([])
+  const [viewPhoto, setViewPhoto] = useState<string | null>(null)
 
   useEffect(() => {
     fetch(`/api/jobs/${params.id}`).then((r) => r.json()).then((data) => {
       if (data.job) setJob(data.job)
     })
+    fetch(`/api/jobs/${params.id}/photos`).then((r) => r.json()).then((data) => {
+      setPhotos(data.photos || [])
+    })
   }, [params.id])
+
+  const viewFullPhoto = async (photoId: string) => {
+    const res = await fetch(`/api/jobs/${params.id}/photos/${photoId}`)
+    const data = await res.json()
+    if (data.photo?.photo_data) setViewPhoto(data.photo.photo_data)
+  }
+
+  const deletePhoto = async (photoId: string) => {
+    if (!confirm("Delete this photo?")) return
+    const res = await fetch(`/api/jobs/${params.id}/photos/${photoId}`, { method: "DELETE" })
+    if (res.ok) setPhotos(photos.filter(p => p.id !== photoId))
+  }
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault()
@@ -110,6 +131,34 @@ export default function JobDetailPage() {
           <button type="button" onClick={handleDelete} className="text-red-600 px-4 py-2">Delete</button>
         </div>
       </form>
+
+      {/* Job Site Photos */}
+      <div className="mt-6 bg-white p-6 rounded-lg shadow">
+        <h2 className="text-lg font-bold text-gray-900 mb-4">Job Site Photos</h2>
+        {photos.length > 0 ? (
+          <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+            {photos.map((p) => (
+              <div key={p.id} className="relative group">
+                <img src={p.photo_preview} alt={p.caption || "Job photo"} className="w-full h-24 object-cover rounded-lg border" />
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-2 bg-black/50 rounded-lg">
+                  <button onClick={() => viewFullPhoto(p.id)} className="text-white text-xs bg-blue-600 px-2 py-1 rounded">View</button>
+                  <button onClick={() => deletePhoto(p.id)} className="text-white text-xs bg-red-600 px-2 py-1 rounded">Delete</button>
+                </div>
+                <p className="text-xs text-gray-500 mt-1">{new Date(p.created_at).toLocaleDateString()}</p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-sm text-gray-400">No photos uploaded yet. Use the mobile app to capture job site photos.</p>
+        )}
+      </div>
+
+      {/* Full photo modal */}
+      {viewPhoto && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50" onClick={() => setViewPhoto(null)}>
+          <img src={viewPhoto} alt="Full size" className="max-w-full max-h-full object-contain" />
+        </div>
+      )}
     </div>
   )
 }
