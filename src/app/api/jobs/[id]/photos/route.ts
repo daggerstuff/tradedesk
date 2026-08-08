@@ -5,8 +5,9 @@ import { verifyToken } from '@/lib/auth';
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   // Auth: cookie session (web) or Bearer token (mobile)
   let userId: string | null = null;
   const authHeader = req.headers.get('authorization');
@@ -25,7 +26,7 @@ export async function GET(
      LEFT(photo_data, 100) as photo_preview,
      LENGTH(photo_data) as photo_size
      FROM job_photos WHERE job_id = $1 ORDER BY created_at DESC`,
-    [params.id]
+    [id]
   );
 
   return NextResponse.json({ photos });
@@ -33,8 +34,9 @@ export async function GET(
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   let userId: string | null = null;
   const authHeader = req.headers.get('authorization');
   if (authHeader?.startsWith('Bearer ')) {
@@ -60,16 +62,8 @@ export async function POST(
   const result = await query(
     `INSERT INTO job_photos (job_id, uploaded_by, photo_data, caption)
      VALUES ($1, $2, $3, $4) RETURNING id, job_id, caption, created_at`,
-    [params.id, userId, photoData, caption || null]
+    [id, userId, photoData, caption || null]
   );
 
   return NextResponse.json({ photo: result[0] }, { status: 201 });
-}
-
-export async function GET_FULL(
-  req: NextRequest,
-  { params }: { params: { id: string; photoId: string } }
-) {
-  // This is handled by the [photoId] route
-  return NextResponse.json({ error: 'Not implemented' }, { status: 501 });
 }

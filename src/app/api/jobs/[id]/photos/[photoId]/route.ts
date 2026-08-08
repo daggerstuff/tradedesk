@@ -5,8 +5,9 @@ import { verifyToken } from '@/lib/auth';
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string; photoId: string } }
+  { params }: { params: Promise<{ id: string; photoId: string }> }
 ) {
+  const { id, photoId } = await params;
   let userId: string | null = null;
   const authHeader = req.headers.get('authorization');
   if (authHeader?.startsWith('Bearer ')) {
@@ -22,7 +23,7 @@ export async function GET(
   const photo = await queryOne(
     `SELECT id, job_id, photo_data, caption, created_at
      FROM job_photos WHERE id = $1 AND job_id = $2`,
-    [params.photoId, params.id]
+    [photoId, id]
   );
 
   if (!photo) return NextResponse.json({ error: 'Not found' }, { status: 404 });
@@ -32,8 +33,9 @@ export async function GET(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string; photoId: string } }
+  { params }: { params: Promise<{ id: string; photoId: string }> }
 ) {
+  const { id, photoId } = await params;
   let userId: string | null = null;
   const authHeader = req.headers.get('authorization');
   if (authHeader?.startsWith('Bearer ')) {
@@ -48,7 +50,7 @@ export async function DELETE(
 
   const photo = await queryOne(
     `DELETE FROM job_photos WHERE id = $1 AND job_id = $2 AND uploaded_by = $3 RETURNING id`,
-    [params.photoId, params.id, userId]
+    [photoId, id, userId]
   );
 
   if (!photo) return NextResponse.json({ error: 'Not found or not owner' }, { status: 404 });
