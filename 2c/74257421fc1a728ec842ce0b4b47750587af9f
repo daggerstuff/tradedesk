@@ -1,0 +1,30 @@
+src/app/api/auth/send-link/route.ts
+  s_03be98155c9f0c::t_844fedffb3a1c5 4
+  s_03be98155c9f0c::t_8b370c7e7fcec7 45
+src/app/api/auth/signup/route.ts
+  s_03be98155c9f0c::t_69249bfa0f1298 3-4,60
+src/app/api/webhooks/stripe/route.ts
+  s_03be98155c9f0c::t_b637ff3cfee371 2-3,14-50
+src/app/api/cron/send-reminders/route.ts
+  s_03be98155c9f0c::t_e8bd852caad10d 48
+src/app/dashboard/reminders/page.tsx
+  s_03be98155c9f0c::t_4b3bdef80c9393 105
+src/app/api/auth/verify/route.ts
+  s_03be98155c9f0c::t_f24215a7d656e9 46
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "2c74257421fc1a728ec842ce0b4b47750587af9f",
+  "prompts": {},
+  "sessions": {
+    "s_03be98155c9f0c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ses_022cc5a18ffeY19apSwRCYOgWe",
+        "model": "unknown"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
