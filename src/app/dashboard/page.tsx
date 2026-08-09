@@ -2,6 +2,7 @@ import { getSession } from "@/lib/session"
 import { queryOne, queryMany } from "@/lib/db"
 import Link from "next/link"
 import OnboardingGate from "./onboarding-gate"
+import QuickAddFAB from "./quick-add-fab"
 
 export default async function DashboardOverview() {
   const session = await getSession()
@@ -68,6 +69,7 @@ export default async function DashboardOverview() {
 
   return (
     <OnboardingGate>
+    <QuickAddFAB />
     <div className="p-8 max-w-7xl mx-auto">
       <h1 className="text-2xl font-bold text-gray-900">Overview</h1>
       <p className="text-gray-600 mt-1">Your business at a glance.</p>
