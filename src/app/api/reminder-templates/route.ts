@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { getSession } from '@/lib/session';
+import { getUserPlan, hasFeature } from '@/lib/billing';
 
 export async function GET() {
   const session = await getSession();
@@ -17,6 +18,11 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   const session = await getSession();
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  const { plan } = await getUserPlan(session.userId);
+  if (!hasFeature(plan, 'reminders')) {
+    return NextResponse.json({ error: 'Upgrade to Invoice Reminders ($19/mo) to use this feature.' }, { status: 403 });
+  }
 
   const body = await req.json();
   const { name, subject, body: templateBody, days_before_due } = body;

@@ -78,7 +78,20 @@ export default function FieldServicePage() {
           </thead>
           <tbody className="divide-y">
             {jobs.length === 0 ? (
-              <tr><td colSpan={6} className="px-4 py-8 text-center text-gray-400">No jobs yet</td></tr>
+              <tr>
+                <td colSpan={6} className="px-12 py-16 text-center">
+                  <div className="mx-auto max-w-sm">
+                    <svg className="mx-auto h-12 w-12 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    <p className="mt-4 text-sm font-medium text-gray-900">No jobs yet</p>
+                    <p className="mt-1 text-sm text-gray-500">Create your first job to start tracking field work.</p>
+                    <Link href="/dashboard/field-service/new" className="mt-4 inline-block rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700">
+                      + New Job
+                    </Link>
+                  </div>
+                </td>
+              </tr>
             ) : (
               jobs.map((job) => (
                 <tr key={job.id} className="hover:bg-gray-50 cursor-pointer" onClick={() => window.location.href = `/dashboard/field-service/${job.id}`}>

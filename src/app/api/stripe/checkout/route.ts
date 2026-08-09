@@ -6,7 +6,7 @@ export async function POST(req: NextRequest) {
   const session = await getSession();
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const { planId } = await req.json();
+  const { planId, couponCode } = await req.json();
   const plan = PLANS[planId as keyof typeof PLANS];
 
   if (!plan || plan.priceId === null) {
@@ -19,7 +19,8 @@ export async function POST(req: NextRequest) {
       customer.id,
       plan.priceId,
       `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/settings?upgraded=1`,
-      `${process.env.NEXT_PUBLIC_APP_URL}/pricing`
+      `${process.env.NEXT_PUBLIC_APP_URL}/pricing`,
+      couponCode // promotion codes enabled when provided
     );
 
     return NextResponse.json({ url: checkoutSession.url });

@@ -33,7 +33,7 @@ export function InvoicesScreen() {
         <Text style={styles.due}>Due {new Date(item.due_date).toLocaleDateString()}</Text>
       </View>
       <Text style={styles.amount}>${Number(item.total).toFixed(2)}</Text>
-      <View style={[styles.badge, styles[`badge_${item.status}`] || styles.badge_draft]}>
+      <View style={[styles.badge, (styles as Record<string, object>)[`badge_${item.status}`] || styles.badge_draft]}>
         <Text style={styles.badgeText}>{item.status}</Text>
       </View>
     </TouchableOpacity>

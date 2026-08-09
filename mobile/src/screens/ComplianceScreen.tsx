@@ -33,7 +33,7 @@ export function ComplianceScreen() {
             </Text>
           )}
         </View>
-        <View style={[styles.badge, styles[`badge_${item.status}`] || styles.badge_active]}>
+        <View style={[styles.badge, (styles as Record<string, object>)[`badge_${item.status}`] || styles.badge_active]}>
           <Text style={styles.badgeText}>{item.status}</Text>
         </View>
       </View>

@@ -44,6 +44,39 @@ export function invoiceReminderEmail(name: string, invoiceNumber: string, amount
   `;
 }
 
+export function welcomeEmail(name: string): string {
+  return `
+    <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto; padding: 32px;">
+      <h1 style="color: #1a1a1a; font-size: 24px;">Welcome to TradeDesk!</h1>
+      <p>Hi ${name || 'there'},</p>
+      <p>Your account is ready. Here's how to get started:</p>
+      <ul style="padding-left: 20px; line-height: 1.8;">
+        <li>Add your first customer</li>
+        <li>Create and send an invoice</li>
+        <li>Set up invoice reminders to get paid faster</li>
+        <li>Track compliance documents</li>
+      </ul>
+      <a href="https://tradedesk.timewarper.me/dashboard" style="display: inline-block; background: #2563eb; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; margin: 16px 0;">
+        Go to Dashboard
+      </a>
+      <p style="color: #666; font-size: 14px;">Questions? Reply to this email — we're happy to help.</p>
+    </div>
+  `;
+}
+
+export function inviteEmail(inviteLink: string): string {
+  return `
+    <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto; padding: 32px;">
+      <h1 style="color: #1a1a1a; font-size: 24px;">You've been invited to TradeDesk</h1>
+      <p>Someone invited you to join their team on TradeDesk. Click below to accept:</p>
+      <a href="${inviteLink}" style="display: inline-block; background: #2563eb; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; margin: 16px 0;">
+        Join Team
+      </a>
+      <p style="color: #666; font-size: 14px;">If you don't have an account yet, you'll create one during signup.</p>
+    </div>
+  `;
+}
+
 export function complianceReminderEmail(name: string, docTitle: string, expiryDate: string): string {
   return `
     <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto; padding: 32px;">

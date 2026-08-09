@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next"
 import "./globals.css"
 import { Toaster } from "react-hot-toast"
+import { Analytics } from "@vercel/analytics/react"
 
 export const metadata: Metadata = {
   title: "TradeDesk — Business tools for small businesses",
@@ -34,6 +35,7 @@ export default function RootLayout({
     <html lang="en">
       <body className="antialiased">
         {children}
+        <Analytics />
         <Toaster position="top-center" />
       </body>
     </html>

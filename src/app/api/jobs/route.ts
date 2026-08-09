@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { getSession } from "@/lib/session"
 import { query, queryMany } from "@/lib/db"
 import { generateId } from "@/lib/auth"
+import { getUserPlan, hasFeature } from "@/lib/billing"
 
 export async function GET(request: Request) {
   const session = await getSession()
@@ -17,6 +18,11 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   const session = await getSession()
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+
+  const { plan } = await getUserPlan(session.userId)
+  if (!hasFeature(plan, 'fieldService')) {
+    return NextResponse.json({ error: "Upgrade to Field Service ($15/mo) to use this feature." }, { status: 403 })
+  }
 
   const body = await request.json()
   const id = generateId("job")

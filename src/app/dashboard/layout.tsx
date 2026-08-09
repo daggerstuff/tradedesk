@@ -2,6 +2,7 @@ import { redirect } from "next/navigation"
 import { getSession } from "@/lib/session"
 import { queryOne } from "@/lib/db"
 import SidebarNav from "./sidebar-nav"
+import FeedbackWidget from "@/components/FeedbackWidget"
 
 export default async function DashboardLayout({
   children,
@@ -25,6 +26,7 @@ export default async function DashboardLayout({
       {/* pt-14 for mobile top bar, lg:pt-0 removes it on desktop */}
       <div className="lg:ml-64 pt-14 lg:pt-0">
         {children}
+        <FeedbackWidget />
       </div>
     </div>
   )

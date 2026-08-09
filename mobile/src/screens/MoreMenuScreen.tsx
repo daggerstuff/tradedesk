@@ -22,7 +22,7 @@ export function MoreMenuScreen() {
       <Text style={styles.title}>More</Text>
       <View style={styles.grid}>
         {menuItems.map((item) => (
-          <TouchableOpacity key={item.name} style={styles.card} onPress={() => nav.navigate(item.name)}>
+          <TouchableOpacity key={item.name} style={styles.card} onPress={() => nav.navigate(item.name as any)}>
             <Ionicons name={item.icon as any} size={28} color="#4f46e5" />
             <Text style={styles.cardLabel}>{item.label}</Text>
           </TouchableOpacity>

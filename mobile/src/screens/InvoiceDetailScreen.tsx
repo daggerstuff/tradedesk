@@ -44,7 +44,7 @@ export function InvoiceDetailScreen() {
     <ScrollView style={styles.container} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#6366f1" />}>
       <View style={styles.header}>
         <Text style={styles.number}>{invoice.invoice_number}</Text>
-        <View style={[styles.badge, styles[`badge_${invoice.status}`] || styles.badge_draft]}>
+        <View style={[styles.badge, (styles as Record<string, object>)[`badge_${invoice.status}`] || styles.badge_draft]}>
           <Text style={styles.badgeText}>{invoice.status}</Text>
         </View>
       </View>

@@ -45,7 +45,7 @@ export function QuoteDetailScreen() {
     <ScrollView style={styles.container} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#6366f1" />}>
       <View style={styles.header}>
         <Text style={styles.number}>{quote.quote_number}</Text>
-        <View style={[styles.badge, styles[`badge_${quote.status}`] || styles.badge_draft]}>
+        <View style={[styles.badge, (styles as Record<string, object>)[`badge_${quote.status}`] || styles.badge_draft]}>
           <Text style={styles.badgeText}>{quote.status}</Text>
         </View>
       </View>

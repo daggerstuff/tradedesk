@@ -7,7 +7,8 @@ export default async function ReportsPage() {
 
   const [
     monthlyRevenue, monthlyExpenses, outstandingByStatus,
-    topCustomers, expenseBreakdown, jobProfitability, complianceSummary
+    topCustomers, expenseBreakdown, jobProfitability, complianceSummary,
+    yearlyRevenue, yearlyExpenses
   ] = await Promise.all([
     queryMany<{ month: string; revenue: string }>(
       `SELECT TO_CHAR(d, 'Mon') as month, COALESCE(SUM(i.total), 0) as revenue
@@ -60,6 +61,18 @@ export default async function ReportsPage() {
        END as status,
        COUNT(*) as count
        FROM compliance_docs WHERE user_id = $1 GROUP BY 1`,
+      [session.userId]
+    ),
+    queryMany<{ year: string; revenue: string }>(
+      `SELECT EXTRACT(YEAR FROM issue_date)::text as year, COALESCE(SUM(total), 0) as revenue
+       FROM invoices WHERE user_id = $1 AND status = 'paid'
+       GROUP BY year ORDER BY year`,
+      [session.userId]
+    ),
+    queryMany<{ year: string; expenses: string }>(
+      `SELECT EXTRACT(YEAR FROM date)::text as year, COALESCE(SUM(amount), 0) as expenses
+       FROM expenses WHERE user_id = $1
+       GROUP BY year ORDER BY year`,
       [session.userId]
     ),
   ])
@@ -224,6 +237,73 @@ export default async function ReportsPage() {
               })}
             </div>
           )}
+        </div>
+      </div>
+
+      {/* P&L Statement by Year */}
+      <div className="rounded-lg border border-gray-200 bg-white p-6 mt-6">
+        <h2 className="text-lg font-semibold text-gray-900">Profit & Loss Statement</h2>
+        <p className="text-sm text-gray-500 mt-1">Annual summary for tax preparation.</p>
+        <div className="mt-4 overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b text-left text-gray-500">
+                <th className="pb-3 font-medium">Year</th>
+                <th className="pb-3 font-medium text-right">Revenue</th>
+                <th className="pb-3 font-medium text-right">Expenses</th>
+                <th className="pb-3 font-medium text-right">Net Income</th>
+                <th className="pb-3 font-medium text-right">Margin</th>
+              </tr>
+            </thead>
+            <tbody>
+              {(() => {
+                const years = new Set([...yearlyRevenue.map(r => r.year), ...yearlyExpenses.map(e => e.year)])
+                const sorted = Array.from(years).sort((a, b) => b.localeCompare(a))
+                if (sorted.length === 0) return (
+                  <tr><td colSpan={5} className="py-4 text-gray-400">No data yet.</td></tr>
+                )
+                return sorted.map(year => {
+                  const rev = yearlyRevenue.find(r => r.year === year)
+                  const exp = yearlyExpenses.find(e => e.year === year)
+                  const revenue = parseFloat(rev?.revenue || "0")
+                  const expenses = parseFloat(exp?.expenses || "0")
+                  const net = revenue - expenses
+                  const margin = revenue > 0 ? ((net / revenue) * 100).toFixed(0) : "—"
+                  return (
+                    <tr key={year} className="border-b last:border-0">
+                      <td className="py-3 font-medium text-gray-900">{year}</td>
+                      <td className="py-3 text-right text-green-600">${revenue.toFixed(2)}</td>
+                      <td className="py-3 text-right text-red-600">${expenses.toFixed(2)}</td>
+                      <td className={`py-3 text-right font-medium ${net >= 0 ? "text-gray-900" : "text-red-600"}`}>${net.toFixed(2)}</td>
+                      <td className="py-3 text-right text-gray-500">{margin}{margin !== "—" ? "%" : ""}</td>
+                    </tr>
+                  )
+                })
+              })()}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Tax Prep Export */}
+      <div className="rounded-lg border border-gray-200 bg-white p-6 mt-6">
+        <h2 className="text-lg font-semibold text-gray-900">Tax Prep Export</h2>
+        <p className="text-sm text-gray-500 mt-1">Download income and expense data for your accountant or tax software.</p>
+        <div className="flex flex-wrap gap-3 mt-4">
+          {(() => {
+            const currentYear = new Date().getFullYear()
+            const years = [currentYear, currentYear - 1, currentYear - 2]
+            return years.map(year => (
+              <a
+                key={year}
+                href={`/api/reports/tax-export?year=${year}`}
+                className="inline-flex items-center gap-2 rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                {year} Export (CSV)
+              </a>
+            ))
+          })()}
         </div>
       </div>
     </div>

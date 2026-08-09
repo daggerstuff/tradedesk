@@ -32,13 +32,15 @@ export async function createCheckoutSession(
   customerId: string,
   priceId: string,
   successUrl: string,
-  cancelUrl: string
+  cancelUrl: string,
+  allowPromo = false
 ): Promise<Stripe.Checkout.Session> {
   return stripe.checkout.sessions.create({
     customer: customerId,
     payment_method_types: ['card'],
     line_items: [{ price: priceId, quantity: 1 }],
     mode: 'subscription',
+    ...(allowPromo ? { allow_promotion_codes: true } : {}),
     success_url: successUrl,
     cancel_url: cancelUrl,
   });

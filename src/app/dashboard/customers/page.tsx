@@ -1,6 +1,7 @@
 import { getSession } from "@/lib/session"
 import { queryMany } from "@/lib/db"
 import Link from "next/link"
+import { CsvImportButton } from "./csv-import"
 
 export default async function CustomersPage() {
   const session = await getSession()
@@ -21,23 +22,29 @@ export default async function CustomersPage() {
     <div className="p-8">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Customers</h1>
-        <Link
-          href="/dashboard/customers/new"
-          className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
-        >
-          + Add Customer
-        </Link>
+        <div className="flex items-center gap-3">
+          <CsvImportButton />
+          <Link
+            href="/dashboard/customers/new"
+            className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
+          >
+            + Add Customer
+          </Link>
+        </div>
       </div>
 
       {customers.length === 0 ? (
         <div className="rounded-lg border border-gray-200 bg-white p-12 text-center">
-          <p className="text-gray-500">No customers yet. Add your first customer to get started.</p>
-          <Link
-            href="/dashboard/customers/new"
-            className="mt-4 inline-block rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
-          >
-            + Add Customer
-          </Link>
+          <p className="text-gray-500">No customers yet. Add your first customer or import from CSV.</p>
+          <div className="flex items-center justify-center gap-3 mt-4">
+            <CsvImportButton />
+            <Link
+              href="/dashboard/customers/new"
+              className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
+            >
+              + Add Customer
+            </Link>
+          </div>
         </div>
       ) : (
         <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">

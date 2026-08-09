@@ -1,36 +1,98 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TradeDesk
+
+A simple business management tool for tradespeople and small service businesses. Customers, invoices, quotes, expenses, field service, compliance tracking, and automated reminders — all in one place.
+
+## Features
+
+- **Dashboard** — Overview of revenue, outstanding invoices, active jobs, upcoming compliance expiries
+- **Customers** — Contact management with company details
+- **Invoices** — Create, send, and track invoices with online payment links
+- **Quotes** — Generate and send quotes that convert to invoices
+- **Field Service** — Job scheduling, status tracking, location notes
+- **Expenses** — Categorize spending by job or vendor
+- **Compliance** — Track license and certificate expiry dates
+- **Reminders** — Automated email reminders for overdue invoices
+- **Reports** — Revenue, expense, and profitability breakdowns
+- **Mobile** — React Native app for on-the-go access
+
+## Tech Stack
+
+- **Framework:** Next.js 16 (App Router)
+- **Database:** PostgreSQL
+- **Auth:** JWT sessions (bcrypt + jose)
+- **Payments:** Stripe
+- **Email:** Resend
+- **Mobile:** Expo / React Native
+- **Deployment:** Vercel
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 20+
+- pnpm (recommended) or npm
+- PostgreSQL database
+- Stripe account
+- Resend account (for transactional email)
+
+### Installation
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# Clone the repo
+git clone https://github.com/daggerstuff/tradedesk.git
+cd tradedesk
+
+# Install dependencies
+pnpm install
+
+# Set up environment variables
+cp .env.example .env.local
+# Fill in your values in .env.local
+
+# Run the database migration
+psql $DATABASE_URL < db/migration.sql
+
+# Start dev server
+pnpm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Visit `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Environment Variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+See `.env.example` for all required variables.
 
-## Learn More
+| Variable | Description |
+|----------|-------------|
+| `DATABASE_URL` | PostgreSQL connection string |
+| `JWT_SECRET` | Secret key for signing session JWTs |
+| `NEXT_PUBLIC_APP_URL` | Public URL of the app |
+| `STRIPE_SECRET_KEY` | Stripe secret key |
+| `STRIPE_WEBHOOK_SECRET` | Stripe webhook signing secret |
+| `STRIPE_PRICE_*` | Stripe price IDs for each plan |
+| `RESEND_API_KEY` | Resend API key for email |
+| `CRON_SECRET` | Secret for authenticating cron job requests |
 
-To learn more about Next.js, take a look at the following resources:
+## Deployment
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Vercel
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+vercel deploy
+```
 
-## Deploy on Vercel
+Cron jobs are configured in `vercel.json`:
+- Daily at 9 AM UTC — Invoice reminders
+- Daily at 8 AM UTC — Compliance expiry checks
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Database Migration
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+After deploying, run the migration against your production database:
+
+```bash
+psql $DATABASE_URL < db/migration.sql
+```
+
+## License
+
+MIT

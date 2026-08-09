@@ -87,6 +87,44 @@ export default async function DashboardOverview() {
         ))}
       </div>
 
+        {/* Onboarding banner for new users */}
+        {customerCount && customerCount.count === "0" && invoiceCount && invoiceCount.count === "0" && (
+          <div className="mt-6 rounded-lg border border-indigo-200 bg-indigo-50 p-6">
+            <h2 className="text-lg font-semibold text-indigo-900">Welcome to TradeDesk! 👋</h2>
+            <p className="text-sm text-indigo-700 mt-1">Get started with these quick steps:</p>
+            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <Link href="/dashboard/customers/new" className="flex items-center gap-3 rounded-lg border border-indigo-200 bg-white p-3 hover:shadow-md transition-shadow">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-600 text-white text-lg">1</div>
+                <div>
+                  <p className="text-sm font-medium text-gray-900">Add your first customer</p>
+                  <p className="text-xs text-gray-500">Set up customer records and contact info</p>
+                </div>
+              </Link>
+              <Link href="/dashboard/invoices/new" className="flex items-center gap-3 rounded-lg border border-indigo-200 bg-white p-3 hover:shadow-md transition-shadow">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-600 text-white text-lg">2</div>
+                <div>
+                  <p className="text-sm font-medium text-gray-900">Create an invoice</p>
+                  <p className="text-xs text-gray-500">Send professional invoices and get paid</p>
+                </div>
+              </Link>
+              <Link href="/dashboard/quotes/new" className="flex items-center gap-3 rounded-lg border border-indigo-200 bg-white p-3 hover:shadow-md transition-shadow">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-600 text-white text-lg">3</div>
+                <div>
+                  <p className="text-sm font-medium text-gray-900">Write a quote</p>
+                  <p className="text-xs text-gray-500">Send estimates and convert them to invoices</p>
+                </div>
+              </Link>
+              <Link href="/dashboard/field-service/new" className="flex items-center gap-3 rounded-lg border border-indigo-200 bg-white p-3 hover:shadow-md transition-shadow">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-600 text-white text-lg">4</div>
+                <div>
+                  <p className="text-sm font-medium text-gray-900">Set up a job</p>
+                  <p className="text-xs text-gray-500">Track field work from your phone</p>
+                </div>
+              </Link>
+            </div>
+          </div>
+        )}
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
         {/* Revenue chart */}
         <div className="lg:col-span-2 rounded-lg border border-gray-200 bg-white p-6">
@@ -150,7 +188,12 @@ export default async function DashboardOverview() {
             <Link href="/dashboard/invoices" className="text-sm text-indigo-600 hover:text-indigo-500">View all →</Link>
           </div>
           {recentInvoices.length === 0 ? (
-            <p className="text-gray-400 text-sm">No invoices yet.</p>
+            <div className="text-center py-6">
+              <p className="text-gray-400 text-sm">No invoices yet.</p>
+              <Link href="/dashboard/invoices/new" className="mt-2 inline-block text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                Create your first invoice →
+              </Link>
+            </div>
           ) : (
             <ul className="space-y-3">
               {recentInvoices.map((inv) => (
@@ -178,7 +221,12 @@ export default async function DashboardOverview() {
             <Link href="/dashboard/field-service" className="text-sm text-indigo-600 hover:text-indigo-500">View all →</Link>
           </div>
           {recentJobs.length === 0 ? (
-            <p className="text-gray-400 text-sm">No jobs yet.</p>
+            <div className="text-center py-6">
+              <p className="text-gray-400 text-sm">No jobs yet.</p>
+              <Link href="/dashboard/field-service/new" className="mt-2 inline-block text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                Create your first job →
+              </Link>
+            </div>
           ) : (
             <ul className="space-y-3">
               {recentJobs.map((job) => (

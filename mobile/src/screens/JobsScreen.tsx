@@ -32,7 +32,7 @@ export function JobsScreen() {
         <Text style={styles.customer}>{item.customer_name}</Text>
         <Text style={styles.date}>{item.scheduled_date ? new Date(item.scheduled_date).toLocaleDateString() : 'Unscheduled'}</Text>
       </View>
-      <View style={[styles.badge, styles[`badge_${item.status}`] || styles.badge_scheduled]}>
+      <View style={[styles.badge, (styles as Record<string, object>)[`badge_${item.status}`] || styles.badge_scheduled]}>
         <Text style={styles.badgeText}>{item.status}</Text>
       </View>
     </TouchableOpacity>

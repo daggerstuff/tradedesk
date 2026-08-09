@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "skills": {
+    "competitor-analysis": {
+      "source": "phuryn/pm-skills",
+      "sourceType": "github",
+      "skillPath": "pm-market-research/skills/competitor-analysis/SKILL.md",
+      "computedHash": "589b2783c3fa6f8a559217ebf053b8311a8dea27627037798c8eba177efe58b7"
+    },
+    "pricing-strategy": {
+      "source": "refoundai/lenny-skills",
+      "sourceType": "github",
+      "skillPath": "skills/pricing-strategy/SKILL.md",
+      "computedHash": "6ad8ce3083aba089651bca2d40ca26ecc16bdd69b9a8a9bab9199b08d59ed5ea"
+    }
+  }
+}

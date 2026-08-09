@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { getSession } from '@/lib/session';
+import { checkLimit } from '@/lib/billing';
 
 export async function GET() {
   const session = await getSession();
@@ -21,6 +22,11 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   const session = await getSession();
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  const check = await checkLimit(session.userId, 'invoices');
+  if (!check.allowed) {
+    return NextResponse.json({ error: `Plan limit reached (${check.current}/${check.limit} invoices/month). Upgrade for more.` }, { status: 403 });
+  }
 
   const body = await req.json();
   const { customerId, invoiceNumber, issueDate, dueDate, items, notes, taxRate } = body;

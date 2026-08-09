@@ -74,7 +74,7 @@ export function DashboardScreen() {
             <Text style={styles.itemSub}>{inv.customer_name}</Text>
           </View>
           <Text style={styles.itemAmount}>${Number(inv.total).toFixed(2)}</Text>
-          <View style={[styles.badge, styles[`badge_${inv.status}`] || styles.badge_draft]}>
+          <View style={[styles.badge, (styles as Record<string, object>)[`badge_${inv.status}`] || styles.badge_draft]}>
             <Text style={styles.badgeText}>{inv.status}</Text>
           </View>
         </TouchableOpacity>

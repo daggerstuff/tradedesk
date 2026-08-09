@@ -11,5 +11,9 @@ export async function GET(req: NextRequest) {
   if (!user) {
     return NextResponse.json({ error: 'User not found' }, { status: 404 });
   }
-  return NextResponse.json({ user });
+  const subscription = await queryOne<{ plan: string; status: string }>(
+    'SELECT plan, status FROM subscriptions WHERE user_id = $1',
+    [session.userId]
+  );
+  return NextResponse.json({ user, subscription: subscription ?? { plan: 'free', status: 'active' } });
 }

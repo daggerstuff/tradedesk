@@ -124,7 +124,7 @@ export function JobDetailScreen() {
     <ScrollView style={styles.container} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#6366f1" />}>
       <View style={styles.header}>
         <Text style={styles.title}>{job.title}</Text>
-        <View style={[styles.badge, styles[`badge_${job.status}`] || styles.badge_scheduled]}>
+        <View style={[styles.badge, (styles as Record<string, object>)[`badge_${job.status}`] || styles.badge_scheduled]}>
           <Text style={styles.badgeText}>{job.status}</Text>
         </View>
       </View>
