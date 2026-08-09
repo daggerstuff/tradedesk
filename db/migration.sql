@@ -66,6 +66,16 @@ CREATE TABLE IF NOT EXISTS invoices (
   updated_at     TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Line Item Templates (quick items)
+CREATE TABLE IF NOT EXISTS line_item_templates (
+  id          TEXT PRIMARY KEY,
+  user_id     TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  description TEXT NOT NULL,
+  quantity    NUMERIC(10,2) DEFAULT 1,
+  unit_price  NUMERIC(12,2) DEFAULT 0,
+  created_at  TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- Invoice line items
 CREATE TABLE IF NOT EXISTS invoice_items (
   id          TEXT PRIMARY KEY DEFAULT gen_random_uuid(),

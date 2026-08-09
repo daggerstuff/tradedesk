@@ -11,7 +11,8 @@ export default async function DashboardOverview() {
   // Parallel fetch all stats
   const [
     customerCount, invoiceCount, outstandingAR, activeJobs,
-    upcomingExpiries, monthlyRevenue, recentInvoices, recentJobs
+    upcomingExpiries, monthlyRevenue, recentInvoices, recentJobs,
+    quoteCount, pendingQuotesValue, monthlyExpenses, avgInvoiceValue
   ] = await Promise.all([
     queryOne<{ count: string }>("SELECT COUNT(*) as count FROM customers WHERE user_id = $1", [session.userId]),
     queryOne<{ count: string }>("SELECT COUNT(*) as count FROM invoices WHERE user_id = $1", [session.userId]),
@@ -50,6 +51,19 @@ export default async function DashboardOverview() {
        WHERE j.user_id = $1 ORDER BY j.created_at DESC LIMIT 5`,
       [session.userId]
     ),
+    queryOne<{ count: string }>("SELECT COUNT(*) as count FROM quotes WHERE user_id = $1", [session.userId]),
+    queryOne<{ total: string | null }>(
+      `SELECT COALESCE(SUM(total), 0) as total FROM quotes WHERE user_id = $1 AND status = 'sent'`,
+      [session.userId]
+    ),
+    queryOne<{ total: string | null }>(
+      `SELECT COALESCE(SUM(amount), 0) as total FROM expenses WHERE user_id = $1 AND date >= date_trunc('month', NOW())`,
+      [session.userId]
+    ),
+    queryOne<{ avg: string | null }>(
+      `SELECT COALESCE(AVG(total), 0) as avg FROM invoices WHERE user_id = $1 AND status = 'paid'`,
+      [session.userId]
+    ),
   ])
 
   const stats = [
@@ -57,6 +71,10 @@ export default async function DashboardOverview() {
     { label: "Invoices", value: invoiceCount?.count || "0", href: "/dashboard/invoices" },
     { label: "Outstanding A/R", value: `$${parseFloat(outstandingAR?.total || "0").toFixed(0)}`, href: "/dashboard/invoices" },
     { label: "Active Jobs", value: activeJobs?.count || "0", href: "/dashboard/field-service" },
+    { label: "Quotes", value: quoteCount?.count || "0", href: "/dashboard/quotes" },
+    { label: "Pending Quotes", value: `$${parseFloat(pendingQuotesValue?.total || "0").toFixed(0)}`, href: "/dashboard/quotes" },
+    { label: "Expenses (MTD)", value: `$${parseFloat(monthlyExpenses?.total || "0").toFixed(0)}`, href: "/dashboard/expenses" },
+    { label: "Avg Invoice", value: `$${parseFloat(avgInvoiceValue?.avg || "0").toFixed(0)}`, href: "/dashboard/reports" },
   ]
 
   const statusColors: Record<string, string> = {
@@ -86,6 +104,49 @@ export default async function DashboardOverview() {
             <p className="text-2xl font-bold text-gray-900 mt-2">{stat.value}</p>
           </Link>
         ))}
+      </div>
+
+      {/* Quick actions */}
+      <div className="mt-6">
+        <h2 className="text-sm font-medium text-gray-500 mb-3">Quick Actions</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <Link href="/dashboard/invoices/new" className="flex items-center gap-3 rounded-lg border border-gray-200 bg-white p-4 hover:border-indigo-300 hover:bg-indigo-50 transition-colors">
+            <div className="h-10 w-10 rounded-lg bg-indigo-100 flex items-center justify-center">
+              <svg className="h-5 w-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-900">New Invoice</p>
+              <p className="text-xs text-gray-500">Create & send</p>
+            </div>
+          </Link>
+          <Link href="/dashboard/quotes/new" className="flex items-center gap-3 rounded-lg border border-gray-200 bg-white p-4 hover:border-purple-300 hover:bg-purple-50 transition-colors">
+            <div className="h-10 w-10 rounded-lg bg-purple-100 flex items-center justify-center">
+              <svg className="h-5 w-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" /></svg>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-900">New Quote</p>
+              <p className="text-xs text-gray-500">Send estimate</p>
+            </div>
+          </Link>
+          <Link href="/dashboard/customers/new" className="flex items-center gap-3 rounded-lg border border-gray-200 bg-white p-4 hover:border-green-300 hover:bg-green-50 transition-colors">
+            <div className="h-10 w-10 rounded-lg bg-green-100 flex items-center justify-center">
+              <svg className="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" /></svg>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-900">Add Customer</p>
+              <p className="text-xs text-gray-500">New client</p>
+            </div>
+          </Link>
+          <Link href="/dashboard/expenses/new" className="flex items-center gap-3 rounded-lg border border-gray-200 bg-white p-4 hover:border-orange-300 hover:bg-orange-50 transition-colors">
+            <div className="h-10 w-10 rounded-lg bg-orange-100 flex items-center justify-center">
+              <svg className="h-5 w-5 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-900">Log Expense</p>
+              <p className="text-xs text-gray-500">Track spending</p>
+            </div>
+          </Link>
+        </div>
       </div>
 
         {/* Onboarding banner for new users */}

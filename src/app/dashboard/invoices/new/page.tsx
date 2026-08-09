@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
+import { QuickItems } from '../quick-items';
 
 interface Customer {
   id: string;
@@ -136,6 +137,8 @@ export default function NewInvoicePage() {
               + Add item
             </button>
           </div>
+
+          <QuickItems onAdd={(item) => setItems([...items, item])} />
 
           <div className="space-y-3">
             {items.map((item, idx) => (
