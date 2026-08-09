@@ -177,6 +177,8 @@ function QuickBooksSection() {
   const [connected, setConnected] = useState(false);
   const [importing, setImporting] = useState(false);
   const [imported, setImported] = useState<number | null>(null);
+  const [importingExpenses, setImportingExpenses] = useState(false);
+  const [importedExpenses, setImportedExpenses] = useState<number | null>(null);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -188,18 +190,27 @@ function QuickBooksSection() {
 
   async function handleImport() {
     setImporting(true);
-    const res = await fetch('/api/quickbooks/import', { method: 'POST' });
+    const res = await fetch('/api/quickbooks/import', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: 'customers' }) });
     const data = await res.json();
     setImported(data.imported || 0);
     setImporting(false);
     toast.success(`Imported ${data.imported || 0} customers`);
   }
 
+  async function handleImportExpenses() {
+    setImportingExpenses(true);
+    const res = await fetch('/api/quickbooks/import', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: 'expenses' }) });
+    const data = await res.json();
+    setImportedExpenses(data.imported || 0);
+    setImportingExpenses(false);
+    toast.success(`Imported ${data.imported || 0} expenses`);
+  }
+
   if (!connected) {
     return (
       <div className="space-y-3">
         <p className="text-sm text-gray-600">
-          Connect your QuickBooks account to import customers and invoices.
+          Connect your QuickBooks account to import customers and expenses.
         </p>
         <a
           href="/api/quickbooks/connect"
@@ -216,15 +227,27 @@ function QuickBooksSection() {
       <div className="flex items-center gap-2">
         <span className="px-2 py-1 bg-green-100 text-green-800 rounded text-xs font-medium">Connected</span>
       </div>
-      <button
-        onClick={handleImport}
-        disabled={importing}
-        className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm font-medium disabled:opacity-50"
-      >
-        {importing ? 'Importing...' : 'Import Customers from QuickBooks'}
-      </button>
+      <div className="flex flex-wrap gap-3">
+        <button
+          onClick={handleImport}
+          disabled={importing}
+          className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm font-medium disabled:opacity-50"
+        >
+          {importing ? 'Importing...' : 'Import Customers'}
+        </button>
+        <button
+          onClick={handleImportExpenses}
+          disabled={importingExpenses}
+          className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 text-sm font-medium disabled:opacity-50"
+        >
+          {importingExpenses ? 'Importing...' : 'Import Expenses'}
+        </button>
+      </div>
       {imported !== null && (
         <p className="text-sm text-green-600">{imported} customers imported.</p>
+      )}
+      {importedExpenses !== null && (
+        <p className="text-sm text-indigo-600">{importedExpenses} expenses imported.</p>
       )}
     </div>
   );

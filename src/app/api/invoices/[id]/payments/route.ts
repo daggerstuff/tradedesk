@@ -1,86 +1,66 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { query, queryOne } from '@/lib/db';
-import { getSession } from '@/lib/session';
-import { generateId } from '@/lib/auth';
-import { sendPushNotification } from '@/lib/push';
+import { NextRequest, NextResponse } from "next/server";
+import { query } from "@/lib/db";
+import { getSession } from "@/lib/session";
 
-export async function GET(
-  _req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await getSession();
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
-  const { id } = await params;
-
-  // Verify invoice belongs to user
-  const invoice = await queryOne(
-    `SELECT id, total FROM invoices WHERE id = $1 AND user_id = $2`,
-    [id, session.userId]
-  );
-  if (!invoice) return NextResponse.json({ error: 'Not found' }, { status: 404 });
-
-  const payments = await query<{ amount: string }>(
-    `SELECT amount FROM payments WHERE invoice_id = $1 ORDER BY date DESC`,
-    [id]
-  );
-
-  const totalPaid = payments.reduce((sum, p) =>
-    sum + parseFloat(p.amount), 0);
-
-  return NextResponse.json({ payments, totalPaid, invoiceTotal: invoice.total });
-}
-
-export async function POST(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  const session = await getSession();
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id } = await params;
   const body = await req.json();
   const { amount, method, date, reference } = body;
 
-  if (!amount || !date) {
-    return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+  if (!amount || !method || !date) {
+    return NextResponse.json({ error: "Amount, method, and date are required" }, { status: 400 });
   }
 
-  const invoice = await queryOne<{ total: string; status: string }>(
-    `SELECT total, status FROM invoices WHERE id = $1 AND user_id = $2`,
+  const invoices = await query(
+    `SELECT id, total, status FROM invoices WHERE id = $1 AND user_id = $2`,
     [id, session.userId]
   );
-  if (!invoice) return NextResponse.json({ error: 'Invoice not found' }, { status: 404 });
+  if (!invoices.length) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  const paymentId = generateId('pay');
-  await query(
-    `INSERT INTO payments (id, invoice_id, amount, method, date, reference)
-     VALUES ($1, $2, $3, $4, $5, $6)`,
-    [paymentId, id, amount, method || 'cash', date, reference || null]
+  const invoice = invoices[0] as { id: string; total: string; status: string };
+
+  const paymentResult = await query(
+    `INSERT INTO payments (invoice_id, amount, method, date, reference) VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+    [id, amount, method, date, reference || null]
   );
 
-  // Check if invoice is now fully paid
-  const payments = await query<{ amount: string }>(`SELECT amount FROM payments WHERE invoice_id = $1`, [id]);
-  const totalPaid = payments.reduce((sum, p) =>
-    sum + parseFloat(p.amount), 0);
+  const payments = await query(
+    `SELECT COALESCE(SUM(amount), 0) as total_paid FROM payments WHERE invoice_id = $1`,
+    [id]
+  );
+  const totalPaid = parseFloat((payments[0] as { total_paid: string }).total_paid || "0");
 
-  if (parseFloat(totalPaid.toString()) >= parseFloat(invoice.total)) {
-    await query(`UPDATE invoices SET status = 'paid' WHERE id = $1`, [id]);
-  } else if (invoice.status === 'draft') {
-    await query(`UPDATE invoices SET status = 'sent' WHERE id = $1`, [id]);
+  let invoiceStatus = invoice.status;
+  if (totalPaid >= parseFloat(invoice.total)) {
+    await query(`UPDATE invoices SET status = 'paid', updated_at = NOW() WHERE id = $1`, [id]);
+    invoiceStatus = "paid";
+  } else if (totalPaid > 0) {
+    await query(`UPDATE invoices SET status = 'partial', updated_at = NOW() WHERE id = $1`, [id]);
+    invoiceStatus = "partial";
   }
 
-  const invoiceInfo = await queryOne<{ invoice_number: string; customer_name: string }>(
-    `SELECT i.invoice_number, c.name as customer_name FROM invoices i LEFT JOIN customers c ON i.customer_id = c.id WHERE i.id = $1`,
+  return NextResponse.json({ payment: paymentResult[0], totalPaid, invoiceStatus }, { status: 201 });
+}
+
+export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const session = await getSession();
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const { id } = await params;
+
+  const invoices = await query(
+    `SELECT id FROM invoices WHERE id = $1 AND user_id = $2`,
+    [id, session.userId]
+  );
+  if (!invoices.length) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
+  const payments = await query(
+    `SELECT id, amount, method, date, reference, created_at FROM payments WHERE invoice_id = $1 ORDER BY date DESC`,
     [id]
   );
 
-  await sendPushNotification(
-    session.userId,
-    'Payment Received',
-    `$${parseFloat(amount).toFixed(2)} for Invoice #${invoiceInfo?.invoice_number || id} from ${invoiceInfo?.customer_name || 'customer'}`,
-    { type: 'payment', invoiceId: id, amount: String(amount) }
-  );
-
-  return NextResponse.json({ payment: { id: paymentId }, totalPaid }, { status: 201 });
+  return NextResponse.json({ payments });
 }
