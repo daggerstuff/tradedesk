@@ -134,6 +134,15 @@ CREATE TABLE IF NOT EXISTS jobs (
 );
 
 -- Expenses
+-- Expense Categories
+CREATE TABLE IF NOT EXISTS expense_categories (
+  id          TEXT PRIMARY KEY,
+  user_id     TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  name        TEXT NOT NULL,
+  color       TEXT DEFAULT '#64748b',
+  created_at  TIMESTAMPTZ DEFAULT NOW()
+);
+
 CREATE TABLE IF NOT EXISTS expenses (
   id          TEXT PRIMARY KEY,
   user_id     TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,

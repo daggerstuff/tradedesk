@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
+import { CategoryManager } from './categories-manager';
 
 const PLAN_INFO: Record<string, { name: string; price: string; limits: string }> = {
   free: { name: 'Free', price: '$0/mo', limits: '5 customers, 5 invoices/mo' },
@@ -104,6 +105,12 @@ export default function SettingsPage() {
       <div className="bg-white rounded-lg shadow p-6">
         <h2 className="text-lg font-semibold mb-4">Company Settings</h2>
         <CompanySection />
+      </div>
+
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-lg font-semibold mb-4">Expense Categories</h2>
+        <p className="text-sm text-gray-500 mb-4">Manage categories for tracking expenses and organizing your spending.</p>
+        <CategoryManager />
       </div>
 
       <div className="bg-white rounded-lg shadow p-6">
