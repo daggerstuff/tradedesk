@@ -24,11 +24,19 @@ interface InvoicePayClientProps {
   balance: number;
   shareToken: string;
   justPaid: boolean;
+  bankDetails?: {
+    bankName: string | null;
+    accountName: string | null;
+    routing: string | null;
+    account: string | null;
+    instructions: string | null;
+  };
 }
 
-export default function InvoicePayClient({ invoice, items, payments, totalPaid, balance, shareToken, justPaid }: InvoicePayClientProps) {
+export default function InvoicePayClient({ invoice, items, payments, totalPaid, balance, shareToken, justPaid, bankDetails }: InvoicePayClientProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState<'card' | 'bank'>('card');
 
   const handlePay = async () => {
     setLoading(true);
@@ -178,13 +186,83 @@ export default function InvoicePayClient({ invoice, items, payments, totalPaid, 
 
           {/* Pay button */}
           {!isPaid ? (
-            <button
-              onClick={handlePay}
-              disabled={loading}
-              className="w-full rounded-lg bg-indigo-600 px-6 py-3 text-white font-medium hover:bg-indigo-500 disabled:opacity-50 transition-colors"
-            >
-              {loading ? 'Redirecting to payment...' : `Pay $${balance.toFixed(2)} with Card`}
-            </button>
+            <div className="space-y-3">
+              {/* Payment method tabs */}
+              <div className="flex rounded-lg border border-gray-200 p-1 bg-gray-50">
+                <button
+                  onClick={() => setPaymentMethod('card')}
+                  className={`flex-1 rounded-md py-2 text-sm font-medium transition-colors ${
+                    paymentMethod === 'card'
+                      ? 'bg-white text-gray-900 shadow-sm'
+                      : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  Pay by Card
+                </button>
+                <button
+                  onClick={() => setPaymentMethod('bank')}
+                  className={`flex-1 rounded-md py-2 text-sm font-medium transition-colors ${
+                    paymentMethod === 'bank'
+                      ? 'bg-white text-gray-900 shadow-sm'
+                      : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  Bank Transfer
+                </button>
+              </div>
+
+              {paymentMethod === 'card' ? (
+                <button
+                  onClick={handlePay}
+                  disabled={loading}
+                  className="w-full rounded-lg bg-indigo-600 px-6 py-3 text-white font-medium hover:bg-indigo-500 disabled:opacity-50 transition-colors"
+                >
+                  {loading ? 'Redirecting to payment...' : `Pay $${balance.toFixed(2)} with Card`}
+                </button>
+              ) : (
+                <div className="rounded-lg border border-gray-200 bg-gray-50 p-5">
+                  <h3 className="text-sm font-semibold text-gray-900 mb-3">Bank Transfer Details</h3>
+                  {bankDetails?.bankName ? (
+                    <div className="space-y-2 text-sm">
+                      {bankDetails.bankName && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-500">Bank</span>
+                          <span className="text-gray-900 font-medium">{bankDetails.bankName}</span>
+                        </div>
+                      )}
+                      {bankDetails.accountName && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-500">Account Name</span>
+                          <span className="text-gray-900 font-medium">{bankDetails.accountName}</span>
+                        </div>
+                      )}
+                      {bankDetails.routing && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-500">Routing Number</span>
+                          <span className="text-gray-900 font-medium">{bankDetails.routing}</span>
+                        </div>
+                      )}
+                      {bankDetails.account && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-500">Account Number</span>
+                          <span className="text-gray-900 font-medium">{bankDetails.account}</span>
+                        </div>
+                      )}
+                      {bankDetails.instructions && (
+                        <p className="mt-3 text-xs text-gray-600 border-t pt-3">{bankDetails.instructions}</p>
+                      )}
+                      <p className="mt-3 text-xs text-gray-500">
+                        Please include invoice #{invoice.invoice_number} as reference. Your invoice will be marked as paid once the transfer is confirmed.
+                      </p>
+                    </div>
+                  ) : (
+                    <p className="text-sm text-gray-600">
+                      Bank transfer details are not available. Please pay by card or contact the invoice sender.
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
           ) : (
             <div className="rounded-lg bg-green-50 border border-green-200 p-4 text-center">
               <p className="text-green-800 font-medium">This invoice has been paid in full. Thank you!</p>

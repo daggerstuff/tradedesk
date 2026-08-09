@@ -7,7 +7,8 @@ export async function GET() {
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const rows = await query(
-    `SELECT id, email, name, company, company_address, company_city, company_state, company_zip, company_country, tax_id, logo_url, phone
+    `SELECT id, email, name, company, company_address, company_city, company_state, company_zip, company_country, tax_id, logo_url, phone,
+            bank_name, bank_account_name, bank_routing, bank_account, bank_instructions
      FROM users WHERE id = $1`,
     [session.userId]
   );
@@ -21,7 +22,8 @@ export async function PUT(req: NextRequest) {
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const body = await req.json();
-  const { name, company, companyAddress, companyCity, companyState, companyZip, companyCountry, taxId, logoUrl, phone, skipOnboarding } = body;
+  const { name, company, companyAddress, companyCity, companyState, companyZip, companyCountry, taxId, logoUrl, phone, skipOnboarding,
+    bankName, accountName, routing, account, instructions } = body;
 
   await query(
     `UPDATE users SET
@@ -35,9 +37,15 @@ export async function PUT(req: NextRequest) {
        tax_id = COALESCE($9, tax_id),
        logo_url = COALESCE($10, logo_url),
        phone = COALESCE($11, phone),
+       bank_name = COALESCE($12, bank_name),
+       bank_account_name = COALESCE($13, bank_account_name),
+       bank_routing = COALESCE($14, bank_routing),
+       bank_account = COALESCE($15, bank_account),
+       bank_instructions = COALESCE($16, bank_instructions),
        onboarding_completed = true
      WHERE id = $1`,
-    [session.userId, name, company, companyAddress, companyCity, companyState, companyZip, companyCountry || 'US', taxId, logoUrl, phone]
+    [session.userId, name, company, companyAddress, companyCity, companyState, companyZip, companyCountry || 'US', taxId, logoUrl, phone,
+     bankName, accountName, routing, account, instructions]
   );
 
   return NextResponse.json({ success: true });

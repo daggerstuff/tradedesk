@@ -108,6 +108,11 @@ export default function SettingsPage() {
       </div>
 
       <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-lg font-semibold mb-4">Bank Transfer Details</h2>
+        <BankSection />
+      </div>
+
+      <div className="bg-white rounded-lg shadow p-6">
         <h2 className="text-lg font-semibold mb-4">Expense Categories</h2>
         <p className="text-sm text-gray-500 mb-4">Manage categories for tracking expenses and organizing your spending.</p>
         <CategoryManager />
@@ -356,6 +361,76 @@ function CompanySection() {
       </div>
       <button onClick={handleSave} disabled={saving} className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50">
         {saving ? 'Saving...' : 'Save Company Settings'}
+      </button>
+    </div>
+  );
+}
+
+function BankSection() {
+  const [saving, setSaving] = useState(false);
+  const [form, setForm] = useState({
+    bankName: '',
+    accountName: '',
+    routing: '',
+    account: '',
+    instructions: '',
+  });
+
+  useEffect(() => {
+    fetch('/api/settings/company').then(r => r.json()).then(data => {
+      if (data.user) {
+        setForm({
+          bankName: data.user.bank_name || '',
+          accountName: data.user.bank_account_name || '',
+          routing: data.user.bank_routing || '',
+          account: data.user.bank_account || '',
+          instructions: data.user.bank_instructions || '',
+        });
+      }
+    });
+  }, []);
+
+  const handleSave = async () => {
+    setSaving(true);
+    const res = await fetch('/api/settings/company', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(form),
+    });
+    if (res.ok) toast.success('Bank details saved');
+    else toast.error('Failed to save');
+    setSaving(false);
+  };
+
+  return (
+    <div className="space-y-4">
+      <p className="text-sm text-gray-500">
+        Add your bank details to display them on invoices for customers who want to pay via bank transfer.
+      </p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Bank Name</label>
+          <input type="text" value={form.bankName} onChange={e => setForm({ ...form, bankName: e.target.value })} className="w-full rounded-md border border-gray-300 px-3 py-2" placeholder="Chase Bank" />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Account Name</label>
+          <input type="text" value={form.accountName} onChange={e => setForm({ ...form, accountName: e.target.value })} className="w-full rounded-md border border-gray-300 px-3 py-2" placeholder="John's Plumbing LLC" />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Routing Number</label>
+          <input type="text" value={form.routing} onChange={e => setForm({ ...form, routing: e.target.value })} className="w-full rounded-md border border-gray-300 px-3 py-2" placeholder="021000021" />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Account Number</label>
+          <input type="text" value={form.account} onChange={e => setForm({ ...form, account: e.target.value })} className="w-full rounded-md border border-gray-300 px-3 py-2" placeholder="****1234" />
+        </div>
+        <div className="sm:col-span-2">
+          <label className="block text-sm font-medium text-gray-700 mb-1">Payment Instructions</label>
+          <textarea value={form.instructions} onChange={e => setForm({ ...form, instructions: e.target.value })} className="w-full rounded-md border border-gray-300 px-3 py-2" rows={3} placeholder="Please include invoice number as reference. Allow 3-5 business days for processing." />
+        </div>
+      </div>
+      <button onClick={handleSave} disabled={saving} className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50">
+        {saving ? 'Saving...' : 'Save Bank Details'}
       </button>
     </div>
   );

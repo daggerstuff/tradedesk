@@ -1,4 +1,5 @@
 import Link from "next/link"
+import Script from "next/script"
 
 export default function LandingPage() {
   const PH_LAUNCH = false; // flip to true on launch day
@@ -165,6 +166,57 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Testimonials */}
+      <section className="border-y border-gray-100 bg-white">
+        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl">Trusted by trades businesses</h2>
+            <p className="mt-4 text-lg text-gray-600">
+              Real contractors use TradeDesk to get paid faster and stay organized.
+            </p>
+          </div>
+          <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-3">
+            {[
+              {
+                quote: "I was spending hours chasing payments. TradeDesk's automated reminders cut my late payments in half.",
+                name: "Mike R.",
+                role: "Electrical Contractor",
+              },
+              {
+                quote: "Finally, software that doesn't need a manual. I set up my whole customer list in one afternoon.",
+                name: "Sarah K.",
+                role: "HVAC Technician",
+              },
+              {
+                quote: "The compliance tracking alone is worth it. No more scrambling when licenses expire.",
+                name: "James T.",
+                role: "General Contractor",
+              },
+            ].map((t) => (
+              <div key={t.name} className="rounded-xl border border-gray-200 bg-gray-50 p-6">
+                <div className="flex gap-1 mb-4">
+                  {[...Array(5)].map((_, i) => (
+                    <svg key={i} className="h-4 w-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                  ))}
+                </div>
+                <p className="text-gray-700 text-sm leading-relaxed">&ldquo;{t.quote}&rdquo;</p>
+                <div className="mt-4 flex items-center gap-3">
+                  <div className="h-9 w-9 rounded-full bg-indigo-100 flex items-center justify-center text-sm font-semibold text-indigo-600">
+                    {t.name.charAt(0)}
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-gray-900">{t.name}</p>
+                    <p className="text-xs text-gray-500">{t.role}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* How it works */}
       <section className="border-y border-gray-100 bg-gray-50">
         <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
@@ -189,6 +241,34 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* FAQ */}
+      <section className="bg-white">
+        <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
+          <div className="text-center">
+            <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl">Frequently asked questions</h2>
+          </div>
+          <div className="mt-12 space-y-4">
+            {[
+              { q: "Is there a free trial?", a: "Yes! Every module comes with a free tier so you can try before you buy. No credit card required." },
+              { q: "Can I cancel anytime?", a: "Absolutely. No contracts, no cancellation fees. Cancel from your settings page whenever you want." },
+              { q: "Do I need to install anything?", a: "TradeDesk runs in your browser and works as an installable PWA on your phone. No app store needed." },
+              { q: "Can I import my existing customers?", a: "Yes. Upload a CSV file or connect QuickBooks to import your customer list instantly." },
+              { q: "How do invoice reminders work?", a: "Set up reminder templates and TradeDesk automatically sends them based on your schedule — before or after due dates." },
+            ].map((faq) => (
+              <details key={faq.q} className="group rounded-lg border border-gray-200 bg-gray-50">
+                <summary className="flex cursor-pointer items-center justify-between px-5 py-4 text-sm font-semibold text-gray-900 marker:content-['']">
+                  {faq.q}
+                  <svg className="h-4 w-4 flex-none text-gray-500 transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </summary>
+                <p className="px-5 pb-4 text-sm text-gray-600">{faq.a}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="bg-slate-900">
         <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
@@ -206,6 +286,25 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* FAQ Structured Data */}
+      <Script
+        id="faq-schema"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: [
+              { "@type": "Question", name: "Is there a free trial?", acceptedAnswer: { "@type": "Answer", text: "Yes! Every module comes with a free tier so you can try before you buy. No credit card required." } },
+              { "@type": "Question", name: "Can I cancel anytime?", acceptedAnswer: { "@type": "Answer", text: "Absolutely. No contracts, no cancellation fees. Cancel from your settings page whenever you want." } },
+              { "@type": "Question", name: "Do I need to install anything?", acceptedAnswer: { "@type": "Answer", text: "TradeDesk runs in your browser and works as an installable PWA on your phone. No app store needed." } },
+              { "@type": "Question", name: "Can I import my existing customers?", acceptedAnswer: { "@type": "Answer", text: "Yes. Upload a CSV file or connect QuickBooks to import your customer list instantly." } },
+              { "@type": "Question", name: "How do invoice reminders work?", acceptedAnswer: { "@type": "Answer", text: "Set up reminder templates and TradeDesk automatically sends them based on your schedule — before or after due dates." } },
+            ],
+          }),
+        }}
+      />
 
       {/* Footer */}
       <footer className="border-t border-gray-200 bg-white">

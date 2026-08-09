@@ -228,7 +228,7 @@ CREATE TABLE IF NOT EXISTS reminders (
   id            TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id       TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   invoice_id    TEXT REFERENCES invoices(id) ON DELETE CASCADE,
-  template_id   TEXT REFERENCES reminder_templates(id) ON DELETE SET NULL,
+  template_id   TEXT REFERENCES reminder_template(id) ON DELETE SET NULL,
   type          TEXT,
   subject       TEXT,
   body          TEXT,
@@ -307,3 +307,8 @@ ALTER TABLE users ADD COLUMN IF NOT EXISTS tax_id TEXT;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS logo_url TEXT;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS phone TEXT;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS onboarding_completed BOOLEAN DEFAULT false;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS bank_name TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS bank_account_name TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS bank_routing TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS bank_account TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS bank_instructions TEXT;

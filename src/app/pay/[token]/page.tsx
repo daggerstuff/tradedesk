@@ -3,6 +3,7 @@ import InvoicePayClient from './InvoicePayClient';
 
 interface InvoiceData {
   id: string;
+  user_id: string;
   invoice_number: string;
   issue_date: string;
   due_date: string;
@@ -39,7 +40,7 @@ export default async function InvoicePayPage({ params, searchParams }: {
   const { paid } = await searchParams;
 
   const invoice = await queryOne<InvoiceData>(`
-    SELECT i.id, i.invoice_number, i.issue_date, i.due_date, i.subtotal, i.tax_rate, i.tax_amount, i.total, i.status, i.notes,
+    SELECT i.id, i.user_id, i.invoice_number, i.issue_date, i.due_date, i.subtotal, i.tax_rate, i.tax_amount, i.total, i.status, i.notes,
            c.name as customer_name, c.email as customer_email, c.address as customer_address
     FROM invoices i
     LEFT JOIN customers c ON i.customer_id = c.id
@@ -76,6 +77,17 @@ export default async function InvoicePayPage({ params, searchParams }: {
   const totalPaid = payments.reduce((sum, p) => sum + Number(p.amount), 0);
   const balance = Number(invoice.total) - totalPaid;
 
+  const user = await queryOne<{
+    bank_name: string | null;
+    bank_account_name: string | null;
+    bank_routing: string | null;
+    bank_account: string | null;
+    bank_instructions: string | null;
+  }>(
+    'SELECT bank_name, bank_account_name, bank_routing, bank_account, bank_instructions FROM users WHERE id = $1',
+    [invoice.user_id]
+  );
+
   return (
     <InvoicePayClient
       invoice={invoice}
@@ -85,6 +97,13 @@ export default async function InvoicePayPage({ params, searchParams }: {
       balance={balance}
       shareToken={token}
       justPaid={paid === '1'}
+      bankDetails={{
+        bankName: user?.bank_name || null,
+        accountName: user?.bank_account_name || null,
+        routing: user?.bank_routing || null,
+        account: user?.bank_account || null,
+        instructions: user?.bank_instructions || null,
+      }}
     />
   );
 }
