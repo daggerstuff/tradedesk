@@ -1,4 +1,4 @@
-import { queryOne, queryMany } from '@/lib/db';
+import { queryOne, queryMany, query } from '@/lib/db';
 import InvoicePayClient from './InvoicePayClient';
 
 interface InvoiceData {
@@ -45,6 +45,12 @@ export default async function InvoicePayPage({ params, searchParams }: {
     LEFT JOIN customers c ON i.customer_id = c.id
     WHERE i.share_token = $1
   `, [token]);
+
+  // Auto-mark as viewed when opened via share link
+  if (invoice && invoice.status === 'sent') {
+    await query("UPDATE invoices SET status = 'viewed', updated_at = NOW() WHERE id = $1", [invoice.id]);
+    invoice.status = 'viewed';
+  }
 
   if (!invoice) {
     return (

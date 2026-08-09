@@ -3,16 +3,17 @@ import { query } from "@/lib/db";
 import { getSession } from "@/lib/session";
 import { sendEmail } from "@/lib/resend";
 
-export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function POST(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await getSession();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id } = await params;
 
   const invoices = await query(
-    `SELECT i.*, c.name as customer_name, c.email as customer_email
+    `SELECT i.*, c.name as customer_name, c.email as customer_email, u.company as user_company
      FROM invoices i
      LEFT JOIN customers c ON i.customer_id = c.id
+     LEFT JOIN users u ON u.id = i.user_id
      WHERE i.id = $1 AND i.user_id = $2`,
     [id, session.userId]
   );
@@ -71,7 +72,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   try {
     await sendEmail({
       to: customerEmail,
-      subject: `Invoice ${invoice.invoice_number} from TradeDesk`,
+      subject: `Invoice ${invoice.invoice_number} from ${invoice.user_company || 'TradeDesk'}`,
       html,
     });
 

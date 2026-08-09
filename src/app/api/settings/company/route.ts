@@ -21,7 +21,7 @@ export async function PUT(req: NextRequest) {
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const body = await req.json();
-  const { name, company, companyAddress, companyCity, companyState, companyZip, companyCountry, taxId, logoUrl, phone } = body;
+  const { name, company, companyAddress, companyCity, companyState, companyZip, companyCountry, taxId, logoUrl, phone, skipOnboarding } = body;
 
   await query(
     `UPDATE users SET
@@ -34,7 +34,8 @@ export async function PUT(req: NextRequest) {
        company_country = COALESCE($8, company_country),
        tax_id = COALESCE($9, tax_id),
        logo_url = COALESCE($10, logo_url),
-       phone = COALESCE($11, phone)
+       phone = COALESCE($11, phone),
+       onboarding_completed = true
      WHERE id = $1`,
     [session.userId, name, company, companyAddress, companyCity, companyState, companyZip, companyCountry || 'US', taxId, logoUrl, phone]
   );

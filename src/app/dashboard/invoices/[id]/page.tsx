@@ -40,6 +40,7 @@ interface Payment {
 const STATUS_COLORS: Record<string, string> = {
   draft: 'bg-gray-100 text-gray-800',
   sent: 'bg-blue-100 text-blue-800',
+  viewed: 'bg-yellow-100 text-yellow-800',
   paid: 'bg-green-100 text-green-800',
   overdue: 'bg-red-100 text-red-800',
   cancelled: 'bg-gray-100 text-gray-500',
@@ -151,6 +152,35 @@ export default function InvoiceDetailPage() {
     setEmailLoading(false);
   };
 
+  const handleMarkPaid = async () => {
+    const res = await fetch(`/api/invoices/${params.id}/status`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: 'paid' }),
+    });
+    if (res.ok) {
+      toast.success('Invoice marked as paid');
+      window.location.reload();
+    } else {
+      toast.error('Failed to update status');
+    }
+  };
+
+  const handleCancel = async () => {
+    if (!confirm('Cancel this invoice?')) return;
+    const res = await fetch(`/api/invoices/${params.id}/status`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: 'cancelled' }),
+    });
+    if (res.ok) {
+      toast.success('Invoice cancelled');
+      window.location.reload();
+    } else {
+      toast.error('Failed to cancel');
+    }
+  };
+
   if (!invoice) return <div className="text-center py-12 text-gray-500">Loading...</div>;
 
   const balance = (invoice.total || 0) - totalPaid;
@@ -204,6 +234,21 @@ export default function InvoiceDetailPage() {
                 {emailLoading ? '...' : 'Send Email'}
               </button>
               <a href={`/api/invoices/${params.id}/pdf`} className="px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-800">Download PDF</a>
+              {invoice.status === 'draft' && (
+                <button onClick={handleSendEmail} disabled={emailLoading} className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50">
+                  {emailLoading ? '...' : 'Mark as Sent'}
+                </button>
+              )}
+              {(invoice.status === 'sent' || invoice.status === 'viewed' || invoice.status === 'overdue') && (
+                <button onClick={handleMarkPaid} className="px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700">
+                  Mark as Paid
+                </button>
+              )}
+              {invoice.status !== 'paid' && invoice.status !== 'cancelled' && (
+                <button onClick={handleCancel} className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600">
+                  Cancel
+                </button>
+              )}
               <button onClick={handleDelete} className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">Delete</button>
             </>
           )}
