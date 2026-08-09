@@ -36,11 +36,12 @@ export async function POST(req: NextRequest) {
     if (!name) return NextResponse.json({ error: "Name is required" }, { status: 400 })
 
     const id = generateId("cust")
+    const portalToken = generateId("pt")
     const customer = await queryOne(
-      `INSERT INTO customers (id, user_id, name, email, phone, company_name, address, created_at, updated_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), NOW())
-       RETURNING id, name, email, phone, company_name, address`,
-      [id, session.userId, name, email || null, phone || null, company_name || null, address || null]
+      `INSERT INTO customers (id, user_id, name, email, phone, company_name, address, portal_token, created_at, updated_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW(), NOW())
+       RETURNING id, name, email, phone, company_name, address, portal_token`,
+      [id, session.userId, name, email || null, phone || null, company_name || null, address || null, portalToken]
     )
 
     return NextResponse.json({ customer })

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { getSession } from '@/lib/session';
 import { checkLimit } from '@/lib/billing';
+import { generateId } from '@/lib/auth';
 
 export async function GET() {
   const session = await getSession();
@@ -40,11 +41,12 @@ export async function POST(req: NextRequest) {
   const taxAmount = subtotal * (taxRate || 0) / 100;
   const total = subtotal + taxAmount;
 
+  const shareToken = generateId("inv")
   const result = await query(
-    `INSERT INTO invoices (user_id, customer_id, invoice_number, issue_date, due_date, subtotal, tax_rate, tax_amount, total, status, notes)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'draft', $10)
+    `INSERT INTO invoices (user_id, customer_id, invoice_number, issue_date, due_date, subtotal, tax_rate, tax_amount, total, status, notes, share_token)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'draft', $10, $11)
      RETURNING *`,
-    [session.userId, customerId, invoiceNumber, issueDate, dueDate, subtotal, taxRate || 0, taxAmount, total, notes || null]
+    [session.userId, customerId, invoiceNumber, issueDate, dueDate, subtotal, taxRate || 0, taxAmount, total, notes || null, shareToken]
   );
 
   const invoice = result[0];

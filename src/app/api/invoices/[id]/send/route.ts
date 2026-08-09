@@ -10,7 +10,7 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ id
   const { id } = await params;
 
   const invoices = await query(
-    `SELECT i.*, c.name as customer_name, c.email as customer_email, u.company as user_company
+    `SELECT i.*, c.name as customer_name, c.email as customer_email, c.portal_token, u.company as user_company, u.name as user_name
      FROM invoices i
      LEFT JOIN customers c ON i.customer_id = c.id
      LEFT JOIN users u ON u.id = i.user_id
@@ -40,33 +40,64 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ id
     </tr>
   `).join("");
 
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://tradedesk.app";
+  const payUrl = invoice.share_token ? `${appUrl}/pay/${invoice.share_token}` : `${appUrl}/pay/${id}`;
+  const portalUrl = invoice.portal_token ? `${appUrl}/portal/${invoice.portal_token}` : null;
+  const senderName = invoice.user_company || invoice.user_name || "TradeDesk";
+
   const html = `
-    <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 32px;">
-      <h1 style="color: #1a1a1a; font-size: 24px;">Invoice ${invoice.invoice_number}</h1>
-      <p>Hi ${invoice.customer_name},</p>
-      <p>Here's your invoice for <strong>$${invoice.total}</strong>, due on <strong>${invoice.due_date}</strong>.</p>
-      <table style="width: 100%; border-collapse: collapse; margin: 24px 0;">
-        <thead>
-          <tr style="border-bottom: 2px solid #333;">
-            <th style="text-align: left; padding: 8px 0;">Description</th>
-            <th style="text-align: center; padding: 8px 0;">Qty</th>
-            <th style="text-align: right; padding: 8px 0;">Rate</th>
-            <th style="text-align: right; padding: 8px 0;">Total</th>
-          </tr>
-        </thead>
-        <tbody>${itemsHtml}</tbody>
-      </table>
-      <div style="text-align: right; margin-top: 16px;">
-        <p>Subtotal: <strong>$${invoice.subtotal}</strong></p>
-        <p>Tax (${invoice.tax_rate}%): <strong>$${invoice.tax_amount}</strong></p>
-        <p style="font-size: 18px;">Total: <strong>$${invoice.total}</strong></p>
+    <!DOCTYPE html>
+    <html>
+    <head><meta charset="utf-8"><meta name="viewport" content="width=device-width"></head>
+    <body style="margin: 0; padding: 0; background: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+      <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+        <!-- Header -->
+        <div style="text-align: center; margin-bottom: 32px;">
+          <h1 style="color: #1e293b; font-size: 28px; margin: 0;">Invoice ${invoice.invoice_number}</h1>
+          <p style="color: #64748b; margin: 8px 0 0;">from ${senderName}</p>
+        </div>
+
+        <!-- Main Card -->
+        <div style="background: white; border-radius: 12px; padding: 32px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+          <p style="color: #334155; font-size: 16px; margin: 0 0 8px;">Hi ${invoice.customer_name},</p>
+          <p style="color: #64748b; font-size: 15px; margin: 0 0 24px;">Here's your invoice for <strong style="color: #1e293b;">$${invoice.total}</strong>, due <strong style="color: #1e293b;">${invoice.due_date}</strong>.</p>
+
+          <!-- Line Items -->
+          <table style="width: 100%; border-collapse: collapse; margin: 24px 0;">
+            <thead>
+              <tr style="border-bottom: 2px solid #e2e8f0;">
+                <th style="text-align: left; padding: 12px 0; color: #64748b; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">Description</th>
+                <th style="text-align: center; padding: 12px 0; color: #64748b; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">Qty</th>
+                <th style="text-align: right; padding: 12px 0; color: #64748b; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">Rate</th>
+                <th style="text-align: right; padding: 12px 0; color: #64748b; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">Total</th>
+              </tr>
+            </thead>
+            <tbody>${itemsHtml}</tbody>
+          </table>
+
+          <!-- Totals -->
+          <div style="border-top: 1px solid #e2e8f0; padding-top: 16px; text-align: right;">
+            <p style="margin: 4px 0; color: #64748b; font-size: 14px;">Subtotal: <span style="color: #1e293b;">$${invoice.subtotal}</span></p>
+            <p style="margin: 4px 0; color: #64748b; font-size: 14px;">Tax (${invoice.tax_rate}%): <span style="color: #1e293b;">$${invoice.tax_amount}</span></p>
+            <p style="margin: 8px 0 0; font-size: 20px; font-weight: 700; color: #1e293b;">Total: $${invoice.total}</p>
+          </div>
+
+          ${invoice.notes ? `<p style="margin-top: 24px; padding: 16px; background: #f8fafc; border-radius: 8px; color: #64748b; font-size: 14px;"><strong>Note:</strong> ${invoice.notes}</p>` : ""}
+
+          <!-- CTA -->
+          <div style="text-align: center; margin-top: 32px;">
+            <a href="${payUrl}" style="display: inline-block; background: #4f46e5; color: white; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 16px;">Pay Now</a>
+          </div>
+        </div>
+
+        <!-- Portal Link -->
+        ${portalUrl ? `<p style="text-align: center; margin-top: 24px; font-size: 14px; color: #64748b;"><a href="${portalUrl}" style="color: #4f46e5;">View all your invoices in your customer portal</a></p>` : ""}
+
+        <!-- Footer -->
+        <p style="text-align: center; color: #94a3b8; font-size: 13px; margin-top: 32px;">Thank you for your business!</p>
       </div>
-      ${invoice.notes ? `<p style="margin-top: 24px; color: #666; font-size: 14px;">Note: ${invoice.notes}</p>` : ""}
-      <p style="margin-top: 32px;">
-        <a href="${process.env.NEXT_PUBLIC_APP_URL}/pay/${id}" style="display: inline-block; background: #2563eb; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600;">Pay Online</a>
-      </p>
-      <p style="color: #666; font-size: 14px; margin-top: 32px;">Thank you for your business!</p>
-    </div>
+    </body>
+    </html>
   `;
 
   try {

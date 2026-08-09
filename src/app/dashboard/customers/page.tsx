@@ -2,6 +2,7 @@ import { getSession } from "@/lib/session"
 import { queryMany } from "@/lib/db"
 import Link from "next/link"
 import { CsvImportButton } from "./csv-import"
+import { PortalLinkButton } from "./portal-link"
 
 export default async function CustomersPage() {
   const session = await getSession()
@@ -13,8 +14,9 @@ export default async function CustomersPage() {
     email: string
     phone: string
     company_name: string
+    portal_token: string
   }>(
-    `SELECT id, name, email, phone, company_name FROM customers WHERE user_id = $1 ORDER BY created_at DESC`,
+    `SELECT id, name, email, phone, company_name, portal_token FROM customers WHERE user_id = $1 ORDER BY created_at DESC`,
     [session.userId]
   )
 
@@ -55,6 +57,7 @@ export default async function CustomersPage() {
                 <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">Email</th>
                 <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">Phone</th>
                 <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">Company</th>
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">Portal</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
@@ -68,6 +71,13 @@ export default async function CustomersPage() {
                   <td className="px-6 py-4 text-sm text-gray-700">{c.email || "—"}</td>
                   <td className="px-6 py-4 text-sm text-gray-700">{c.phone || "—"}</td>
                   <td className="px-6 py-4 text-sm text-gray-700">{c.company_name || "—"}</td>
+                  <td className="px-6 py-4 text-sm">
+                    {c.portal_token ? (
+                      <PortalLinkButton token={c.portal_token} />
+                    ) : (
+                      <span className="text-gray-400">—</span>
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>

@@ -42,6 +42,7 @@ CREATE TABLE IF NOT EXISTS customers (
   phone         TEXT,
   company_name  TEXT,
   address       TEXT,
+  portal_token  TEXT UNIQUE,
   created_at    TIMESTAMPTZ DEFAULT NOW(),
   updated_at    TIMESTAMPTZ DEFAULT NOW()
 );
@@ -60,6 +61,7 @@ CREATE TABLE IF NOT EXISTS invoices (
   total          NUMERIC(12,2) DEFAULT 0,
   status         TEXT NOT NULL DEFAULT 'draft',
   notes          TEXT,
+  share_token    TEXT UNIQUE,
   created_at     TIMESTAMPTZ DEFAULT NOW(),
   updated_at     TIMESTAMPTZ DEFAULT NOW()
 );
