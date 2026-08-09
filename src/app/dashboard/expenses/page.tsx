@@ -35,6 +35,14 @@ export default async function ExpensesPage({
 
   const totalSpent = expenses.reduce((sum, e) => sum + parseFloat(e.amount), 0)
 
+  // Category breakdown
+  const categoryTotals: Record<string, number> = {}
+  for (const e of expenses) {
+    categoryTotals[e.category] = (categoryTotals[e.category] || 0) + parseFloat(e.amount)
+  }
+  const categoryEntries = Object.entries(categoryTotals).sort((a, b) => b[1] - a[1])
+  const maxCategory = Math.max(...categoryEntries.map(([, v]) => v), 1)
+
   return (
     <div className="p-8 max-w-7xl mx-auto">
       <div className="flex items-center justify-between mb-6">
@@ -46,6 +54,27 @@ export default async function ExpensesPage({
           + Add Expense
         </Link>
       </div>
+
+      {/* Category breakdown chart */}
+      {categoryEntries.length > 0 && (
+        <div className="rounded-lg border border-gray-200 bg-white p-6 mb-6">
+          <h2 className="text-sm font-semibold text-gray-700 mb-4">Spending by Category</h2>
+          <div className="space-y-3">
+            {categoryEntries.map(([cat, amount]) => (
+              <div key={cat} className="flex items-center gap-3">
+                <span className="w-24 text-sm text-gray-600 capitalize shrink-0">{cat}</span>
+                <div className="flex-1 h-5 bg-gray-100 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-indigo-500 rounded-full"
+                    style={{ width: `${(amount / maxCategory) * 100}%` }}
+                  />
+                </div>
+                <span className="w-20 text-sm font-medium text-gray-900 text-right">${amount.toFixed(2)}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Category filter */}
       <div className="flex flex-wrap gap-2 mb-4">

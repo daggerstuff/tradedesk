@@ -6,6 +6,8 @@ const posts = [
   'compliance-document-tracking',
   'invoice-gets-paid',
   'contractor-expense-tracking',
+  'contractor-estimate-template',
+  'contractor-payment-terms',
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {

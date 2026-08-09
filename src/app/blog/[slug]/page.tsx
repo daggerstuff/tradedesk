@@ -120,6 +120,72 @@ const posts: Record<string, { title: string; date: string; content: string }> = 
       <p><a href="/signup">Start tracking expenses →</a></p>
     `,
   },
+  'contractor-estimate-template': {
+    title: 'How to Write a Contractor Estimate That Wins Jobs (Free Template)',
+    date: '2026-08-09',
+    content: `
+      <p>You showed up, took measurements, and priced the job. Now you need to send an estimate that wins. A sloppy estimate loses jobs to competitors who look more professional — even if their price is higher.</p>
+      <h2>What a professional estimate includes</h2>
+      <ol>
+        <li><strong>Your business info:</strong> Name, license number, insurance details, and contact info. This builds instant trust.</li>
+        <li><strong>Client info:</strong> Name, address, and project location.</li>
+        <li><strong>Scope of work:</strong> A clear, line-by-line description of what you will (and won't) do.</li>
+        <li><strong>Materials and labor:</strong> Break down costs so clients see the value.</li>
+        <li><strong>Total price:</strong> Clear and upfront. No hidden fees.</li>
+        <li><strong>Validity period:</strong> "This estimate is valid for 30 days" protects you from material cost changes.</li>
+        <li><strong>Next steps:</strong> How to approve and what happens after.</li>
+      </ol>
+      <h2>The #1 mistake contractors make</h2>
+      <p>Writing "kitchen remodel — $8,000" with no breakdown. Clients want to see where the money goes. A detailed estimate shows professionalism and reduces price-shopping.</p>
+      <h2>From estimate to invoice</h2>
+      <p>Once approved, your estimate should convert directly into an invoice — same line items, same numbers. TradeDesk lets you do this with one click, so you never re-scope or re-price twice.</p>
+      <h2>Free estimate template</h2>
+      <p>Use this structure for every estimate:</p>
+      <pre>
+[Your Business Name] | [License #]
+Estimate for: [Client Name]
+Project: [Address / Description]
+
+1. [Task description] — $[amount]
+2. [Task description] — $[amount]
+3. [Task description] — $[amount]
+
+Materials: $[amount]
+Labor: $[amount]
+Total: $[amount]
+
+Valid for 30 days. To approve, reply to this email or call [phone].
+      </pre>
+      <p><a href="/signup">Create professional estimates with TradeDesk →</a></p>
+    `,
+  },
+  'contractor-payment-terms': {
+    title: 'Contractor Payment Terms That Actually Get You Paid',
+    date: '2026-08-09',
+    content: `
+      <p>You did the work. The client is happy. But 30 days later, your invoice is still unpaid. The difference between getting paid on time and chasing money often comes down to the payment terms you set upfront.</p>
+      <h2>The best payment terms for contractors</h2>
+      <ul>
+        <li><strong>50% deposit before starting:</strong> Covers materials and commits the client. Never start without one.</li>
+        <li><strong>Milestone payments:</strong> For large projects, bill at 25%, 50%, 75%, and completion.</li>
+        <li><strong>Net 15 (not Net 30):</strong> You're a contractor, not a bank. Shorter terms = faster cash.</li>
+        <li><strong>Late fees:</strong> 1.5% per month on overdue balances. State this clearly on every invoice.</li>
+        <li><strong>Payment methods:</strong> Accept credit cards, bank transfers, and checks. The easier you make it, the faster you get paid.</li>
+      </ul>
+      <h2>What to put in writing</h2>
+      <p>Verbal agreements don't protect you. Every project should have a signed agreement that includes:</p>
+      <ul>
+        <li>Total project cost and payment schedule</li>
+        <li>Deposit amount and when it's due</li>
+        <li>Late fee policy</li>
+        <li>Scope of work (to prevent "while you're here..." creep)</li>
+        <li>Change order process (how extra work gets billed)</li>
+      </ul>
+      <h2>How TradeDesk enforces your terms</h2>
+      <p>TradeDesk includes payment terms automatically on every invoice, sends scheduled reminders before and after the due date, and lets clients pay instantly with a credit card or bank transfer — no excuses for late payment.</p>
+      <p><a href="/signup">Set up payment terms that protect your cash flow →</a></p>
+    `,
+  },
 };
 
 export function generateStaticParams() {

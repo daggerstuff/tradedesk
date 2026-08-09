@@ -31,6 +31,18 @@ const posts = [
     excerpt: 'Most contractors leave money on the table at tax time. Here are the common deductions and a simple system to track them all year round.',
     date: '2026-08-09',
   },
+  {
+    slug: 'contractor-estimate-template',
+    title: 'How to Write a Contractor Estimate That Wins Jobs (Free Template)',
+    excerpt: 'A professional estimate builds trust and helps you win more bids. Learn the exact structure top contractors use — with a ready-to-copy template.',
+    date: '2026-08-09',
+  },
+  {
+    slug: 'contractor-payment-terms',
+    title: 'Contractor Payment Terms That Actually Get You Paid',
+    excerpt: 'The right payment terms protect your cash flow and set clear expectations. Here\'s what to include — and what to avoid — in every contract.',
+    date: '2026-08-09',
+  },
 ];
 
 export const metadata = {
