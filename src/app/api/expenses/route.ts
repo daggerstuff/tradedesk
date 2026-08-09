@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const body = await req.json();
-  const { category, vendor, amount, date, description, jobId } = body;
+  const { category, vendor, amount, date, description, jobId, receiptUrl } = body;
 
   if (!category || !amount || !date) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -36,9 +36,9 @@ export async function POST(req: NextRequest) {
 
   const id = generateId('exp');
   await query(
-    `INSERT INTO expenses (id, user_id, category, vendor, amount, date, description, job_id)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
-    [id, session.userId, category, vendor || null, amount, date, description || null, jobId || null]
+    `INSERT INTO expenses (id, user_id, category, vendor, amount, date, description, receipt_url, job_id)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+    [id, session.userId, category, vendor || null, amount, date, description || null, receiptUrl || null, jobId || null]
   );
 
   return NextResponse.json({ expense: { id } }, { status: 201 });

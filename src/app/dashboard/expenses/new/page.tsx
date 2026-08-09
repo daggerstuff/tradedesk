@@ -13,6 +13,7 @@ export default function NewExpensePage() {
   const [amount, setAmount] = useState("");
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [description, setDescription] = useState("");
+  const [receiptUrl, setReceiptUrl] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -21,7 +22,7 @@ export default function NewExpensePage() {
     const res = await fetch('/api/expenses', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ category, vendor, amount: parseFloat(amount), date, description }),
+      body: JSON.stringify({ category, vendor, amount: parseFloat(amount), date, description, receiptUrl: receiptUrl || null }),
     });
     if (res.ok) {
       router.push('/dashboard/expenses');
@@ -67,6 +68,12 @@ export default function NewExpensePage() {
           <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
           <textarea value={description} onChange={e => setDescription(e.target.value)} rows={2}
             className="w-full rounded-lg border border-gray-300 px-3 py-2" placeholder="What was this for?" />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Receipt Link (optional)</label>
+          <input type="url" value={receiptUrl} onChange={e => setReceiptUrl(e.target.value)}
+            className="w-full rounded-lg border border-gray-300 px-3 py-2" placeholder="https://drive.google.com/..." />
+          <p className="text-xs text-gray-500 mt-1">Link to a cloud-stored receipt (Google Drive, Dropbox, etc.)</p>
         </div>
         <div className="flex gap-3 pt-2">
           <button type="submit" disabled={loading}

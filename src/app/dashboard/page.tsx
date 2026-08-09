@@ -66,9 +66,6 @@ export default async function DashboardOverview() {
     cancelled: "bg-gray-100 text-gray-500",
   }
 
-  // Simple CSS bar chart from monthly revenue
-  const maxRevenue = Math.max(...monthlyRevenue.map(r => parseFloat(r.revenue || "0")), 1)
-
   return (
     <OnboardingGate>
     <div className="p-8 max-w-7xl mx-auto">
@@ -130,25 +127,43 @@ export default async function DashboardOverview() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
         {/* Revenue chart */}
         <div className="lg:col-span-2 rounded-lg border border-gray-200 bg-white p-6">
-          <h2 className="text-lg font-semibold text-gray-900">Revenue (Last 6 Months)</h2>
-          <div className="flex items-end gap-4 h-48 mt-6">
-            {monthlyRevenue.length === 0 ? (
-              <p className="text-gray-400 text-sm">No paid invoices yet.</p>
-            ) : (
-              monthlyRevenue.reverse().map((r) => (
-                <div key={r.month} className="flex-1 flex flex-col items-center gap-2">
-                  <div className="w-full flex items-end h-36">
-                    <div
-                      className="w-full bg-indigo-600 rounded-t transition-all"
-                      style={{ height: `${(parseFloat(r.revenue || "0") / maxRevenue) * 100}%` }}
-                    />
-                  </div>
-                  <span className="text-xs text-gray-500">{r.month}</span>
-                  <span className="text-xs font-medium text-gray-700">${parseFloat(r.revenue || "0").toFixed(0)}</span>
-                </div>
-              ))
-            )}
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-gray-900">Revenue</h2>
+            <span className="text-xs text-gray-500">Last 6 months</span>
           </div>
+          {monthlyRevenue.length === 0 ? (
+            <p className="text-gray-400 text-sm">No paid invoices yet.</p>
+          ) : (() => {
+            const reversed = [...monthlyRevenue].reverse();
+            const max = Math.max(...reversed.map(r => parseFloat(r.revenue || "0")), 1);
+            const total = reversed.reduce((s, r) => s + parseFloat(r.revenue || "0"), 0);
+            return (
+              <>
+                <p className="text-2xl font-bold text-gray-900 mb-1">${total.toLocaleString('en-US', { maximumFractionDigits: 0 })}</p>
+                <p className="text-sm text-gray-500 mb-4">total paid</p>
+                <svg viewBox={`0 0 ${reversed.length * 60} 160`} className="w-full h-48" preserveAspectRatio="none">
+                  {[0, 25, 50, 75, 100].map(pct => (
+                    <line key={pct} x1="0" y1={160 - pct * 1.6} x2={reversed.length * 60} y2={160 - pct * 1.6} stroke="#f3f4f6" strokeWidth="1" />
+                  ))}
+                  {reversed.map((r, i) => {
+                    const h = (parseFloat(r.revenue || "0") / max) * 140;
+                    return (
+                      <g key={r.month}>
+                        <rect x={i * 60 + 8} y={160 - h} width="44" height={h} rx="4" fill="url(#revGrad)" />
+                        <text x={i * 60 + 30} y="158" textAnchor="middle" className="text-[10px]" fill="#9ca3af">{r.month}</text>
+                      </g>
+                    );
+                  })}
+                  <defs>
+                    <linearGradient id="revGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#6366f1" />
+                      <stop offset="100%" stopColor="#4f46e5" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </>
+            );
+          })()}
         </div>
 
         {/* Upcoming compliance expiries */}

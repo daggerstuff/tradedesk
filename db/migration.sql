@@ -140,6 +140,7 @@ CREATE TABLE IF NOT EXISTS expenses (
   amount      NUMERIC(12,2) NOT NULL DEFAULT 0,
   date        DATE,
   description TEXT,
+  receipt_url TEXT,
   job_id      TEXT REFERENCES jobs(id) ON DELETE SET NULL,
   created_at  TIMESTAMPTZ DEFAULT NOW()
 );
