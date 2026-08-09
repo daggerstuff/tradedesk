@@ -245,3 +245,42 @@ CREATE INDEX IF NOT EXISTS idx_payments_invoice_id   ON payments(invoice_id);
 CREATE INDEX IF NOT EXISTS idx_reminders_user_id      ON reminders(user_id);
 CREATE INDEX IF NOT EXISTS idx_subscriptions_user_id  ON subscriptions(user_id);
 CREATE INDEX IF NOT EXISTS idx_subscriptions_stripe   ON subscriptions(stripe_customer_id);
+
+-- Recurring invoices
+CREATE TABLE IF NOT EXISTS recurring_invoices (
+  id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  customer_id TEXT NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+  invoice_number_prefix TEXT NOT NULL DEFAULT 'INV',
+  frequency TEXT NOT NULL DEFAULT 'monthly',
+  day_of_month INTEGER NOT NULL DEFAULT 1,
+  start_date DATE NOT NULL,
+  end_date DATE,
+  tax_rate NUMERIC(5,2) DEFAULT 0,
+  notes TEXT,
+  last_generated DATE,
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS recurring_invoice_items (
+  id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+  recurring_invoice_id TEXT NOT NULL REFERENCES recurring_invoices(id) ON DELETE CASCADE,
+  description TEXT NOT NULL,
+  quantity NUMERIC(10,2) NOT NULL DEFAULT 1,
+  unit_price NUMERIC(12,2) NOT NULL DEFAULT 0
+);
+
+CREATE INDEX IF NOT EXISTS idx_recurring_invoices_user_id ON recurring_invoices(user_id);
+CREATE INDEX IF NOT EXISTS idx_recurring_invoices_active ON recurring_invoices(is_active);
+
+-- Company settings (add columns to users)
+ALTER TABLE users ADD COLUMN IF NOT EXISTS company_address TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS company_city TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS company_state TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS company_zip TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS company_country TEXT DEFAULT 'US';
+ALTER TABLE users ADD COLUMN IF NOT EXISTS tax_id TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS logo_url TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS phone TEXT;

@@ -102,6 +102,11 @@ export default function SettingsPage() {
       </div>
 
       <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-lg font-semibold mb-4">Company Settings</h2>
+        <CompanySection />
+      </div>
+
+      <div className="bg-white rounded-lg shadow p-6">
         <h2 className="text-lg font-semibold mb-4">Subscription</h2>
         <div className="flex items-center gap-3 mb-2">
           <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
@@ -249,6 +254,102 @@ function QuickBooksSection() {
       {importedExpenses !== null && (
         <p className="text-sm text-indigo-600">{importedExpenses} expenses imported.</p>
       )}
+    </div>
+  );
+}
+
+function CompanySection() {
+  const [saving, setSaving] = useState(false);
+  const [form, setForm] = useState({
+    name: '',
+    company: '',
+    companyAddress: '',
+    companyCity: '',
+    companyState: '',
+    companyZip: '',
+    companyCountry: 'US',
+    taxId: '',
+    phone: '',
+  });
+
+  useEffect(() => {
+    fetch('/api/settings/company').then(r => r.json()).then(data => {
+      if (data.user) {
+        setForm({
+          name: data.user.name || '',
+          company: data.user.company || '',
+          companyAddress: data.user.company_address || '',
+          companyCity: data.user.company_city || '',
+          companyState: data.user.company_state || '',
+          companyZip: data.user.company_zip || '',
+          companyCountry: data.user.company_country || 'US',
+          taxId: data.user.tax_id || '',
+          phone: data.user.phone || '',
+        });
+      }
+    });
+  }, []);
+
+  const handleSave = async () => {
+    setSaving(true);
+    const res = await fetch('/api/settings/company', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(form),
+    });
+    if (res.ok) toast.success('Company settings saved');
+    else toast.error('Failed to save');
+    setSaving(false);
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Your Name</label>
+          <input type="text" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} className="w-full rounded-md border border-gray-300 px-3 py-2" />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Company Name</label>
+          <input type="text" value={form.company} onChange={e => setForm({ ...form, company: e.target.value })} className="w-full rounded-md border border-gray-300 px-3 py-2" />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+          <input type="tel" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} className="w-full rounded-md border border-gray-300 px-3 py-2" />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Tax ID / EIN</label>
+          <input type="text" value={form.taxId} onChange={e => setForm({ ...form, taxId: e.target.value })} className="w-full rounded-md border border-gray-300 px-3 py-2" placeholder="XX-XXXXXXX" />
+        </div>
+        <div className="sm:col-span-2">
+          <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
+          <input type="text" value={form.companyAddress} onChange={e => setForm({ ...form, companyAddress: e.target.value })} className="w-full rounded-md border border-gray-300 px-3 py-2" placeholder="123 Main St" />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
+          <input type="text" value={form.companyCity} onChange={e => setForm({ ...form, companyCity: e.target.value })} className="w-full rounded-md border border-gray-300 px-3 py-2" />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">State</label>
+          <input type="text" value={form.companyState} onChange={e => setForm({ ...form, companyState: e.target.value })} className="w-full rounded-md border border-gray-300 px-3 py-2" />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">ZIP</label>
+          <input type="text" value={form.companyZip} onChange={e => setForm({ ...form, companyZip: e.target.value })} className="w-full rounded-md border border-gray-300 px-3 py-2" />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Country</label>
+          <select value={form.companyCountry} onChange={e => setForm({ ...form, companyCountry: e.target.value })} className="w-full rounded-md border border-gray-300 px-3 py-2">
+            <option value="US">United States</option>
+            <option value="CA">Canada</option>
+            <option value="GB">United Kingdom</option>
+            <option value="AU">Australia</option>
+          </select>
+        </div>
+      </div>
+      <button onClick={handleSave} disabled={saving} className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50">
+        {saving ? 'Saving...' : 'Save Company Settings'}
+      </button>
     </div>
   );
 }

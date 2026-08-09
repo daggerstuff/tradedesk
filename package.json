@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@paralleldrive/cuid2": "^3.3.0",
+    "@react-pdf/renderer": "^4.6.0",
     "@types/bcryptjs": "^2.4.6",
     "@vercel/analytics": "^2.0.1",
     "bcryptjs": "^3.0.3",

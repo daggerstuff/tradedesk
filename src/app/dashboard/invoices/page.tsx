@@ -1,6 +1,7 @@
 import { getSession } from "@/lib/session"
 import { queryMany } from "@/lib/db"
 import Link from "next/link"
+import RecurringInvoices from "./recurring"
 
 export default async function InvoicesPage() {
   const session = await getSession()
@@ -81,6 +82,10 @@ export default async function InvoicesPage() {
           </table>
         </div>
       )}
+
+      <div className="mt-10">
+        <RecurringInvoices />
+      </div>
     </div>
   )
 }
