@@ -101,4 +101,21 @@ async function initSecureStore() {
 
 initSecureStore();
 
-export { setToken };
+export { setToken, getToken };
+
+export async function sendTestPush(): Promise<void> {
+  await apiFetch('/push/test', { method: 'POST' });
+}
+
+// Send categorization feedback to improve ML model
+export async function sendCategorizationFeedback(
+  text: string,
+  vendor: string,
+  predictedCategory: string,
+  actualCategory: string
+): Promise<void> {
+  await apiFetch('/expenses/categorize-feedback', {
+    method: 'POST',
+    body: JSON.stringify({ text, vendor, predictedCategory, actualCategory }),
+  });
+}

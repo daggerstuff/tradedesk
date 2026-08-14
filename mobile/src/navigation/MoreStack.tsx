@@ -11,6 +11,7 @@ import { InvoiceDetailScreen } from '../screens/InvoiceDetailScreen';
 import { QuoteDetailScreen } from '../screens/QuoteDetailScreen';
 import { NewQuoteScreen } from '../screens/NewQuoteScreen';
 import { JobDetailScreen } from '../screens/JobDetailScreen';
+import { ReferralScreen } from '../screens/ReferralScreen';
 import type { MoreStackParamList } from './types';
 
 const Stack = createNativeStackNavigator<MoreStackParamList>();
@@ -35,6 +36,7 @@ export function MoreStack() {
       <Stack.Screen name="QuoteDetail" component={QuoteDetailScreen} options={{ title: 'Quote' }} />
       <Stack.Screen name="NewQuote" component={NewQuoteScreen} options={{ title: 'New Quote', presentation: 'modal' }} />
       <Stack.Screen name="JobDetail" component={JobDetailScreen} options={{ title: 'Job Details' }} />
+      <Stack.Screen name="Referral" component={ReferralScreen} options={{ title: 'Referral Program' }} />
     </Stack.Navigator>
   );
 }

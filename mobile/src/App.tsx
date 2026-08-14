@@ -7,6 +7,7 @@ import { StatusBar } from 'expo-status-bar';
 import { AuthStack } from './navigation/AuthStack';
 import { AppStack } from './navigation/AppStack';
 import { apiFetch, setToken, registerForPushNotifications } from './api/client';
+import { initNetworkListener } from './api/offline-queue';
 
 export default function App() {
   const [bootstrapped, setBootstrapped] = useState(false);
@@ -20,6 +21,7 @@ export default function App() {
         await apiFetch('/auth/me');
         setIsAuthed(true);
         await registerForPushNotifications();
+        initNetworkListener();
       } catch {
         setIsAuthed(false);
       } finally {

@@ -1,9 +1,10 @@
-import React, { useState, useCallback } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, RefreshControl } from 'react-native';
+import React, { useState, useCallback, useEffect } from 'react';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, RefreshControl, Alert } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import type { MoreStackParamList } from '../navigation/types';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { apiFetch } from '../api/client';
+import { getQueueStatus, forceSync, getNetworkStatus, addNetworkListener } from '../api/offline-queue';
 
 type Nav = NativeStackNavigationProp<MoreStackParamList, 'Expenses'>;
 
@@ -15,13 +16,34 @@ export function ExpensesScreen() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [filter, setFilter] = useState('all');
+  const [isOnline, setIsOnline] = useState(true);
+  const [syncing, setSyncing] = useState(false);
+  const [queueStatus, setQueueStatus] = useState({ pending: 0, failed: 0, isOnline: true });
   const nav = useNavigation<Nav>();
+
+  useEffect(() => {
+    const unsubscribe = addNetworkListener(() => {
+      setIsOnline(getNetworkStatus());
+      setSyncing(false);
+    });
+    setIsOnline(getNetworkStatus());
+    refreshQueueStatus();
+    return unsubscribe;
+  }, []);
+
+  const refreshQueueStatus = async () => {
+    const status = await getQueueStatus();
+    setQueueStatus(status);
+  };
 
   const load = useCallback(async () => {
     try {
       const data = await apiFetch('/expenses');
       setExpenses(data.expenses || []);
-    } catch { } finally { setRefreshing(false); }
+    } catch { } finally { 
+      setRefreshing(false); 
+      refreshQueueStatus();
+    }
   }, []);
 
   useFocusEffect(useCallback(() => { load(); }, [load]));
@@ -41,8 +63,27 @@ export function ExpensesScreen() {
     </View>
   );
 
+  const handleSync = async () => {
+    setSyncing(true);
+    try {
+      const result = await forceSync();
+      Alert.alert('Sync Complete', `Synced ${result.synced} items${result.failed > 0 ? `, ${result.failed} failed` : ''}`);
+      load();
+    } catch (e: any) {
+      Alert.alert('Sync Failed', e.message);
+    } finally {
+      setSyncing(false);
+      refreshQueueStatus();
+    }
+  };
+
   return (
     <View style={styles.container}>
+      {!isOnline && (
+        <View style={styles.offlineBanner}>
+          <Text style={styles.offlineText}>⚠️ Offline — {queueStatus.pending} pending sync</Text>
+        </View>
+      )}
       <View style={styles.filterRow}>
         {CATEGORIES.map(cat => (
           <TouchableOpacity key={cat} onPress={() => setFilter(cat)} style={[styles.filterPill, filter === cat && styles.filterActive]}>
@@ -62,6 +103,11 @@ export function ExpensesScreen() {
       <TouchableOpacity style={styles.fab} onPress={() => nav.navigate('AddExpense')}>
         <Text style={styles.fabText}>+</Text>
       </TouchableOpacity>
+      {(queueStatus.pending > 0 || !isOnline) && (
+        <TouchableOpacity style={styles.syncButton} onPress={handleSync} disabled={syncing}>
+          <Text style={styles.syncButtonText}>{syncing ? '⏳' : '↻'}</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 }
@@ -81,4 +127,8 @@ const styles = StyleSheet.create({
   empty: { textAlign: 'center', color: '#94a3b8', paddingTop: 60, fontSize: 16 },
   fab: { position: 'absolute', bottom: 20, right: 20, width: 56, height: 56, borderRadius: 28, backgroundColor: '#4f46e5', justifyContent: 'center', alignItems: 'center', shadowColor: '#4f46e5', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 8 },
   fabText: { color: '#fff', fontSize: 28, fontWeight: '300' },
+  offlineBanner: { backgroundColor: '#78350f', borderRadius: 8, padding: 10, marginHorizontal: 16, marginTop: 12, borderWidth: 1, borderColor: '#92400e' },
+  offlineText: { color: '#fde68a', fontSize: 13, textAlign: 'center', fontWeight: '500' },
+  syncButton: { position: 'absolute', bottom: 90, right: 20, width: 48, height: 48, borderRadius: 24, backgroundColor: '#1e293b', justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: '#334155', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 4 },
+  syncButtonText: { color: '#4f46e5', fontSize: 20 },
 });

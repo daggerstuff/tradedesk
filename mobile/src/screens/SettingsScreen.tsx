@@ -1,14 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert, Switch } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Alert, Switch, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { setToken, apiFetch, registerForPushNotifications, unregisterPushNotifications } from '../api/client';
+import { setToken, apiFetch, registerForPushNotifications, unregisterPushNotifications, sendTestPush } from '../api/client';
 
 export function SettingsScreen() {
   const nav = useNavigation<any>();
-  const [pushEnabled, setPushEnabled] = useState(true);
+  const [pushEnabled, setPushEnabled] = useState(false);
+  const [hasToken, setHasToken] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [testSending, setTestSending] = useState(false);
 
   useEffect(() => {
-    apiFetch('/push/register', { method: 'PATCH', body: JSON.stringify({}) }).catch(() => {});
+    apiFetch('/push/register')
+      .then(d => { setPushEnabled(d.enabled); setHasToken(d.hasToken); })
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, []);
 
   const handleLogout = async () => {
@@ -25,21 +31,44 @@ export function SettingsScreen() {
   };
 
   const togglePush = async (value: boolean) => {
+    const prev = pushEnabled;
     setPushEnabled(value);
     try {
       await apiFetch('/push/register', {
-        method: 'PATCH',
+        method: 'PUT',
         body: JSON.stringify({ enabled: value }),
       });
       if (value) {
         await registerForPushNotifications();
+        setHasToken(true);
       } else {
         await unregisterPushNotifications();
+        setHasToken(false);
       }
     } catch {
-      setPushEnabled(!value);
+      setPushEnabled(prev);
     }
   };
+
+  const handleTestPush = async () => {
+    setTestSending(true);
+    try {
+      await sendTestPush();
+      Alert.alert('Sent!', 'Check your notifications.');
+    } catch {
+      Alert.alert('Failed', 'Could not send test notification.');
+    } finally {
+      setTestSending(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <View style={[styles.container, { alignItems: 'center', justifyContent: 'center' }]}>
+        <ActivityIndicator size="large" color="#6366f1" />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -55,7 +84,20 @@ export function SettingsScreen() {
             thumbColor="#fff"
           />
         </View>
-        <Text style={styles.hint}>Get notified about payments, invoices, and compliance alerts.</Text>
+        <Text style={styles.hint}>
+          {pushEnabled && hasToken
+            ? 'You\'re receiving notifications for payments, jobs, and compliance.'
+            : pushEnabled
+              ? 'Enable device permissions to receive notifications.'
+              : 'Get notified about payments, invoices, and compliance alerts.'}
+        </Text>
+        {pushEnabled && (
+          <TouchableOpacity style={styles.testBtn} onPress={handleTestPush} disabled={testSending}>
+            <Text style={styles.testBtnText}>
+              {testSending ? 'Sending...' : 'Send Test Notification'}
+            </Text>
+          </TouchableOpacity>
+        )}
       </View>
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Account</Text>
@@ -82,4 +124,6 @@ const styles = StyleSheet.create({
   logoutText: { fontSize: 16, color: '#ef4444', fontWeight: '500' },
   about: { fontSize: 14, color: '#64748b', marginBottom: 4 },
   hint: { fontSize: 12, color: '#94a3b8', marginTop: 8 },
+  testBtn: { marginTop: 12, backgroundColor: '#6366f1', borderRadius: 8, paddingVertical: 10, alignItems: 'center' },
+  testBtnText: { color: '#fff', fontSize: 14, fontWeight: '600' },
 });

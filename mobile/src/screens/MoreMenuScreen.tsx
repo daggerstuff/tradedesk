@@ -12,6 +12,7 @@ const menuItems: { name: keyof MoreStackParamList; label: string; icon: string }
   { name: 'Customers', label: 'Customers', icon: 'people' },
   { name: 'Reports', label: 'Reports', icon: 'bar-chart' },
   { name: 'Compliance', label: 'Compliance', icon: 'shield-checkmark' },
+  { name: 'Referral', label: 'Referrals', icon: 'gift' },
   { name: 'Settings', label: 'Settings', icon: 'settings' },
 ];
 

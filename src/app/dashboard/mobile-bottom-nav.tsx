@@ -25,6 +25,11 @@ const navItems = [
     icon: "M11 3.055A5.001 5.001 0 005.055 9c0 2.761 2.239 5 5 5M11 3.055A5.001 5.001 0 0116.945 9c0 2.761-2.239 5-5 5M11 3.055V3a2 2 0 012-2h2a2 2 0 012 2v2.5",
   },
   {
+    href: "/dashboard/team",
+    label: "Team",
+    icon: "M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z",
+  },
+  {
     href: "/dashboard/settings",
     label: "More",
     icon: "M4 6h16M4 12h16M4 18h16",

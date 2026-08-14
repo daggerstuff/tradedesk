@@ -192,12 +192,25 @@ export default function SettingsPage() {
 
 function QuickBooksSection() {
   const [connected, setConnected] = useState(false);
+  const [connectedAt, setConnectedAt] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
   const [importing, setImporting] = useState(false);
   const [imported, setImported] = useState<number | null>(null);
   const [importingExpenses, setImportingExpenses] = useState(false);
   const [importedExpenses, setImportedExpenses] = useState<number | null>(null);
+  const [syncing, setSyncing] = useState(false);
+  const [syncResult, setSyncResult] = useState<{ synced: number; results: { invoiceId: string; qbId?: string; error?: string }[] } | null>(null);
 
   useEffect(() => {
+    fetch('/api/quickbooks/status')
+      .then((r) => r.json())
+      .then((data) => {
+        setConnected(data.connected);
+        setConnectedAt(data.connectedAt);
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+
     const params = new URLSearchParams(window.location.search);
     if (params.get('qb') === 'connected') {
       setConnected(true);
@@ -205,29 +218,53 @@ function QuickBooksSection() {
     }
   }, []);
 
-  async function handleImport() {
-    setImporting(true);
-    const res = await fetch('/api/quickbooks/import', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: 'customers' }) });
-    const data = await res.json();
-    setImported(data.imported || 0);
-    setImporting(false);
-    toast.success(`Imported ${data.imported || 0} customers`);
+  async function handleDisconnect() {
+    await fetch('/api/quickbooks/disconnect', { method: 'POST' });
+    setConnected(false);
+    setConnectedAt(null);
+    toast.success('QuickBooks disconnected');
   }
 
-  async function handleImportExpenses() {
-    setImportingExpenses(true);
-    const res = await fetch('/api/quickbooks/import', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: 'expenses' }) });
+  async function handleImport(type: 'customers' | 'expenses') {
+    if (type === 'customers') setImporting(true);
+    else setImportingExpenses(true);
+
+    const res = await fetch('/api/quickbooks/import', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type }),
+    });
     const data = await res.json();
-    setImportedExpenses(data.imported || 0);
-    setImportingExpenses(false);
-    toast.success(`Imported ${data.imported || 0} expenses`);
+
+    if (type === 'customers') {
+      setImported(data.imported || 0);
+      setImporting(false);
+    } else {
+      setImportedExpenses(data.imported || 0);
+      setImportingExpenses(false);
+    }
+    toast.success(`Imported ${data.imported || 0} ${type}`);
+  }
+
+  async function handleSyncInvoices() {
+    setSyncing(true);
+    setSyncResult(null);
+    const res = await fetch('/api/quickbooks/sync-invoices', { method: 'POST' });
+    const data = await res.json();
+    setSyncResult(data);
+    setSyncing(false);
+    toast.success(`Synced ${data.synced} invoices to QuickBooks`);
+  }
+
+  if (loading) {
+    return <p className="text-sm text-gray-500">Loading...</p>;
   }
 
   if (!connected) {
     return (
       <div className="space-y-3">
         <p className="text-sm text-gray-600">
-          Connect your QuickBooks account to import customers and expenses.
+          Connect your QuickBooks account to import customers and expenses, and sync invoices.
         </p>
         <a
           href="/api/quickbooks/connect"
@@ -240,31 +277,70 @@ function QuickBooksSection() {
   }
 
   return (
-    <div className="space-y-3">
-      <div className="flex items-center gap-2">
-        <span className="px-2 py-1 bg-green-100 text-green-800 rounded text-xs font-medium">Connected</span>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <span className="px-2 py-1 bg-green-100 text-green-800 rounded text-xs font-medium">Connected</span>
+          {connectedAt && (
+            <span className="text-xs text-gray-500">
+              since {new Date(connectedAt).toLocaleDateString()}
+            </span>
+          )}
+        </div>
+        <button
+          onClick={handleDisconnect}
+          className="text-sm text-red-600 hover:text-red-700 underline"
+        >
+          Disconnect
+        </button>
       </div>
+
       <div className="flex flex-wrap gap-3">
         <button
-          onClick={handleImport}
+          onClick={() => handleImport('customers')}
           disabled={importing}
           className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm font-medium disabled:opacity-50"
         >
           {importing ? 'Importing...' : 'Import Customers'}
         </button>
         <button
-          onClick={handleImportExpenses}
+          onClick={() => handleImport('expenses')}
           disabled={importingExpenses}
           className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 text-sm font-medium disabled:opacity-50"
         >
           {importingExpenses ? 'Importing...' : 'Import Expenses'}
         </button>
+        <button
+          onClick={handleSyncInvoices}
+          disabled={syncing}
+          className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 text-sm font-medium disabled:opacity-50"
+        >
+          {syncing ? 'Syncing...' : 'Sync Invoices to QB'}
+        </button>
       </div>
+
       {imported !== null && (
         <p className="text-sm text-green-600">{imported} customers imported.</p>
       )}
       {importedExpenses !== null && (
         <p className="text-sm text-indigo-600">{importedExpenses} expenses imported.</p>
+      )}
+      {syncResult && (
+        <div className="text-sm space-y-1">
+          <p className="text-purple-600 font-medium">{syncResult.synced} invoices synced.</p>
+          {syncResult.results?.filter((r) => r.error).length > 0 && (
+            <details className="text-red-600">
+              <summary className="cursor-pointer">
+                {syncResult.results.filter((r) => r.error).length} errors
+              </summary>
+              <ul className="mt-1 ml-4 list-disc">
+                {syncResult.results.filter((r) => r.error).map((r) => (
+                  <li key={r.invoiceId}>{r.error}</li>
+                ))}
+              </ul>
+            </details>
+          )}
+        </div>
       )}
     </div>
   );
@@ -437,7 +513,7 @@ function BankSection() {
 }
 
 function ReferralSection() {
-  const [data, setData] = useState<{ referralCode: string; count: number } | null>(null);
+  const [data, setData] = useState<{ referralCode: string; count: number; referrals: any[]; stats: any } | null>(null);
 
   useEffect(() => {
     fetch('/api/referrals').then(r => r.json()).then(setData);
@@ -446,9 +522,10 @@ function ReferralSection() {
   if (!data) return <p className="text-sm text-gray-500">Loading...</p>;
 
   const shareUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? ''}/signup?ref=${data.referralCode}`;
+  const { totalReferrals, activeReferrals, pendingRewards, freeMonthsEarned, freeMonthsUsed, nextReward } = data.stats;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div>
         <label className="block text-sm font-medium text-gray-500 mb-1">Your referral code</label>
         <div className="flex gap-2">
@@ -461,8 +538,72 @@ function ReferralSection() {
           </button>
         </div>
       </div>
+      
+      {/* Rewards Summary */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="bg-blue-50 p-4 rounded-lg">
+          <p className="text-2xl font-bold text-blue-600">{totalReferrals}</p>
+          <p className="text-sm text-blue-500">Total Referrals</p>
+        </div>
+        <div className="bg-green-50 p-4 rounded-lg">
+          <p className="text-2xl font-bold text-green-600">{activeReferrals}</p>
+          <p className="text-sm text-green-500">Active (Subscribed)</p>
+        </div>
+        <div className="bg-yellow-50 p-4 rounded-lg">
+          <p className="text-2xl font-bold text-yellow-600">{pendingRewards}</p>
+          <p className="text-sm text-yellow-500">Pending Rewards</p>
+        </div>
+        <div className="bg-purple-50 p-4 rounded-lg">
+          <p className="text-2xl font-bold text-purple-600">{freeMonthsEarned - freeMonthsUsed}</p>
+          <p className="text-sm text-purple-500">Free Months Available</p>
+        </div>
+      </div>
+
+      {/* Next Reward Preview */}
+      {nextReward && (
+        <div className="bg-indigo-50 border border-indigo-200 p-4 rounded-lg">
+          <p className="text-sm font-medium text-indigo-800">
+            🎁 Next reward: <span className="font-bold">{nextReward.value} free month{nextReward.value > 1 ? 's' : ''}</span> when your referral subscribes!
+          </p>
+        </div>
+      )}
+
+      {/* Referral List */}
+      <div className="border-t pt-4">
+        <h3 className="text-lg font-medium mb-3">Referred Friends</h3>
+        {data.referrals.length === 0 ? (
+          <p className="text-sm text-gray-500">No referrals yet. Share your code to earn rewards!</p>
+        ) : (
+          <div className="space-y-2">
+            {data.referrals.map((ref: any) => (
+              <div key={ref.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-medium">
+                    {ref.name?.[0]?.toUpperCase() ?? '?'}
+                  </div>
+                  <div>
+                    <p className="font-medium text-sm">{ref.name}</p>
+                    <p className="text-xs text-gray-500">{ref.email}</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <span className={`inline-flex px-2 py-1 text-xs rounded-full ${
+                    ref.status === 'rewarded' ? 'bg-green-100 text-green-700' :
+                    ref.status === 'subscribed' ? 'bg-blue-100 text-blue-700' :
+                    'bg-yellow-100 text-yellow-700'
+                  }`}>
+                    {ref.status.replace('_', ' ')}
+                  </span>
+                  <p className="text-xs text-gray-500 mt-1">{new Date(ref.created_at).toLocaleDateString()}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
       <p className="text-sm text-gray-600">
-        {data.count} friend{data.count !== 1 ? 's' : ''} referred. When they sign up, you both get a free month!
+        Earn 1 free month per friend who subscribes. They get 20% off their first 3 months!
       </p>
     </div>
   );

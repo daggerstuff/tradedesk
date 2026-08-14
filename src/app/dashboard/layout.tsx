@@ -3,6 +3,7 @@ import { getSession } from "@/lib/session"
 import { queryOne } from "@/lib/db"
 import SidebarNav from "./sidebar-nav"
 import MobileBottomNav from "./mobile-bottom-nav"
+import CommandPalette from "./command-palette"
 import FeedbackWidget from "@/components/FeedbackWidget"
 
 export default async function DashboardLayout({
@@ -30,6 +31,7 @@ export default async function DashboardLayout({
         <FeedbackWidget />
       </div>
       <MobileBottomNav />
+      <CommandPalette />
     </div>
   )
 }

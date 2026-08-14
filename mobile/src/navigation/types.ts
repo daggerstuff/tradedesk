@@ -18,6 +18,7 @@ export type MoreStackParamList = {
   QuoteDetail: { id: string };
   NewQuote: undefined;
   JobDetail: { id: string };
+  Referral: undefined;
 };
 
 export type RootStackParamList = BottomTabParamList & MoreStackParamList;
