@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { query } from "@/lib/db";
 import { getSession } from "@/lib/session";
+import { sendInvoicePaidPush } from "@/lib/push";
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await getSession();
@@ -37,6 +38,13 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   if (totalPaid >= parseFloat(invoice.total)) {
     await query(`UPDATE invoices SET status = 'paid', updated_at = NOW() WHERE id = $1`, [id]);
     invoiceStatus = "paid";
+    // Notify invoice owner
+    const inv = await query<{ user_id: string; invoice_number: string; total: string }>(
+      'SELECT user_id, invoice_number, total FROM invoices WHERE id = $1', [id]
+    );
+    if (inv[0]) {
+      sendInvoicePaidPush(inv[0].user_id, inv[0].invoice_number, parseFloat(inv[0].total)).catch(() => {});
+    }
   } else if (totalPaid > 0) {
     await query(`UPDATE invoices SET status = 'partial', updated_at = NOW() WHERE id = $1`, [id]);
     invoiceStatus = "partial";

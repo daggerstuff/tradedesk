@@ -3,6 +3,7 @@ import { getSession } from "@/lib/session"
 import { query, queryMany } from "@/lib/db"
 import { generateId } from "@/lib/auth"
 import { getUserPlan, hasFeature } from "@/lib/billing"
+import { sendJobAssignedPush } from "@/lib/push"
 
 export async function GET(request: Request) {
   const session = await getSession()
@@ -33,5 +34,6 @@ export async function POST(request: Request) {
     [id, session.userId, body.customer_id, body.title, body.description || null, body.status || "scheduled",
      body.scheduled_date || null, body.location || null, body.estimate_amount || null, body.final_amount || null, body.notes || null]
   )
+  sendJobAssignedPush(session.userId, body.title, body.scheduled_date || null).catch(() => {});
   return NextResponse.json({ id })
 }

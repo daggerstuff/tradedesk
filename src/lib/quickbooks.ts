@@ -38,6 +38,28 @@ export async function exchangeQBCode(code: string): Promise<{
   return res.json();
 }
 
+export async function refreshQBToken(refreshToken: string): Promise<{
+  access_token: string;
+  refresh_token: string;
+  expires_in: number;
+}> {
+  const res = await fetch(QB_TOKEN_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      Authorization: `Basic ${Buffer.from(
+        `${process.env.QUICKBOOKS_CLIENT_ID}:${process.env.QUICKBOOKS_CLIENT_SECRET}`
+      ).toString('base64')}`,
+    },
+    body: new URLSearchParams({
+      grant_type: 'refresh_token',
+      refresh_token: refreshToken,
+    }),
+  });
+  if (!res.ok) throw new Error('QuickBooks token refresh failed');
+  return res.json();
+}
+
 export function generateState(userId: string): string {
   return crypto.createHash('sha256').update(`${userId}${process.env.NEXTAUTH_SECRET || 'dev'}`).digest('hex');
 }

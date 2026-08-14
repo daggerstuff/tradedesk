@@ -56,3 +56,81 @@ export async function sendPushNotification(
     console.error('[push] send error:', err);
   }
 }
+
+export async function sendReferralRewardPush(
+  userId: string,
+  refereeName: string,
+  rewardMonths: number
+): Promise<void> {
+  await sendPushNotification(
+    userId,
+    '🎁 Referral Reward Earned!',
+    `${refereeName} subscribed — you earned ${rewardMonths} free month${rewardMonths > 1 ? 's' : ''}!`,
+    { type: 'referral_reward', refereeName, rewardMonths }
+  );
+}
+
+export async function sendReferralSignupPush(
+  userId: string,
+  refereeName: string
+): Promise<void> {
+  await sendPushNotification(
+    userId,
+    '👋 New Referral Signup',
+    `${refereeName} just signed up with your code! You'll earn a free month when they subscribe.`,
+    { type: 'referral_signup', refereeName }
+  );
+}
+
+export async function sendReferralWelcomePush(
+  userId: string,
+  referrerName: string,
+  discountPercent: number
+): Promise<void> {
+  await sendPushNotification(
+    userId,
+    '🎉 Welcome to TradeDesk!',
+    `${referrerName} sent you ${discountPercent}% off your first 3 months. Tap to claim!`,
+    { type: 'referral_welcome', referrerName, discountPercent }
+  );
+}
+
+export async function sendInvoicePaidPush(
+  userId: string,
+  invoiceNumber: string,
+  amount: number
+): Promise<void> {
+  await sendPushNotification(
+    userId,
+    '💰 Invoice Paid!',
+    `Invoice ${invoiceNumber} — $${amount.toFixed(0)} received. Nice.`,
+    { type: 'invoice_paid', invoiceNumber, amount }
+  );
+}
+
+export async function sendJobAssignedPush(
+  userId: string,
+  jobTitle: string,
+  scheduledDate: string | null
+): Promise<void> {
+  const when = scheduledDate ? ` Scheduled ${scheduledDate}.` : '';
+  await sendPushNotification(
+    userId,
+    '🔧 New Job Assigned',
+    `"${jobTitle}"${when}`,
+    { type: 'job_assigned', jobTitle, scheduledDate }
+  );
+}
+
+export async function sendComplianceExpiringPush(
+  userId: string,
+  docName: string,
+  daysLeft: number
+): Promise<void> {
+  await sendPushNotification(
+    userId,
+    '⚠️ Compliance Expiring',
+    `"${docName}" expires in ${daysLeft} day${daysLeft !== 1 ? 's' : ''}. Renew now.`,
+    { type: 'compliance_expiring', docName, daysLeft }
+  );
+}

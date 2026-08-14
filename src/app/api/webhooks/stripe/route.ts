@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { constructWebhookEvent } from '@/lib/stripe';
 import { query, queryOne } from '@/lib/db';
 import { sendPushNotification } from '@/lib/push';
+import { checkAndProcessReferralRewards } from '@/lib/referral-rewards';
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
@@ -66,6 +67,11 @@ export async function POST(req: NextRequest) {
             `UPDATE subscriptions SET plan = $1, status = 'active', stripe_customer_id = $2, updated_at = NOW() WHERE user_id = $3`,
             [plan, customerId, userId]
           );
+          
+          // Process referral rewards when user subscribes to paid plan
+          if (plan !== 'free') {
+            await checkAndProcessReferralRewards(userId);
+          }
         }
         break;
       }

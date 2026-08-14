@@ -5,8 +5,6 @@ import { sendEmail, inviteEmail } from '@/lib/resend';
 import { generateId } from '@/lib/auth';
 import { unauthorized, apiError } from '@/lib/api-errors';
 
-
-
 // List team members
 export async function GET(req: NextRequest) {
   const session = await getSession();
@@ -72,4 +70,21 @@ export async function POST(req: NextRequest) {
   }).catch(() => {});
 
   return NextResponse.json({ ok: true, invited: true });
+}
+
+// Remove a team member
+export async function DELETE(req: NextRequest) {
+  const session = await getSession();
+  if (!session) return unauthorized();
+
+  const { userId } = await req.json();
+  if (!userId) return apiError('User ID required');
+
+  // Only owner can remove members
+  await query(
+    'DELETE FROM team_members WHERE owner_id = $1 AND user_id = $2',
+    [session.userId, userId]
+  );
+
+  return NextResponse.json({ ok: true });
 }

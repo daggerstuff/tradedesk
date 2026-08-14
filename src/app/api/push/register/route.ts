@@ -1,69 +1,86 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/session';
-import { verifyToken } from '@/lib/auth';
 import { query } from '@/lib/db';
+import { unauthorized } from '@/lib/api-errors';
 
-// Get userId from either cookie session (web) or Bearer token (mobile)
-async function getUserIdFromRequest(req: NextRequest): Promise<string | null> {
-  // Try Bearer token first (mobile)
-  const authHeader = req.headers.get('authorization');
-  if (authHeader?.startsWith('Bearer ')) {
-    const token = authHeader.slice(7);
-    const payload = await verifyToken(token);
-    return payload?.userId ?? null;
-  }
-  // Fall back to cookie session (web)
-  const session = await getSession();
-  return session?.userId ?? null;
-}
-
-// POST: register push token
+/**
+ * Register or update the user's Expo push token.
+ * Body: { token: string }
+ */
 export async function POST(req: NextRequest) {
-  const userId = await getUserIdFromRequest(req);
-  if (!userId) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  const session = await getSession();
+  if (!session) return unauthorized();
 
   const { token } = await req.json();
   if (!token || typeof token !== 'string') {
-    return NextResponse.json({ error: 'Token required' }, { status: 400 });
+    return NextResponse.json({ error: 'token required' }, { status: 400 });
+  }
+
+  // Validate Expo push token format
+  if (!token.startsWith('ExponentPushToken[')) {
+    return NextResponse.json({ error: 'Invalid push token format' }, { status: 400 });
   }
 
   await query(
     'UPDATE users SET push_token = $1, push_enabled = true WHERE id = $2',
-    [token, userId]
+    [token, session.userId]
   );
 
-  return NextResponse.json({ success: true });
+  return NextResponse.json({ ok: true });
 }
 
-// DELETE: clear push token
-export async function DELETE(req: NextRequest) {
-  const userId = await getUserIdFromRequest(req);
-  if (!userId) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
-  await query(
-    'UPDATE users SET push_token = NULL WHERE id = $1',
-    [userId]
-  );
-
-  return NextResponse.json({ success: true });
-}
-
-// PATCH: toggle push_enabled
-export async function PATCH(req: NextRequest) {
-  const userId = await getUserIdFromRequest(req);
-  if (!userId) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+/**
+ * Toggle push notifications on/off.
+ * Body: { enabled: boolean }
+ */
+export async function PUT(req: NextRequest) {
+  const session = await getSession();
+  if (!session) return unauthorized();
 
   const { enabled } = await req.json();
+  if (typeof enabled !== 'boolean') {
+    return NextResponse.json({ error: 'enabled (boolean) required' }, { status: 400 });
+  }
+
   await query(
     'UPDATE users SET push_enabled = $1 WHERE id = $2',
-    [!!enabled, userId]
+    [enabled, session.userId]
   );
 
-  return NextResponse.json({ success: true });
+  return NextResponse.json({ ok: true, enabled });
+}
+
+/**
+ * Remove push token (opt-out completely).
+ */
+export async function DELETE() {
+  const session = await getSession();
+  if (!session) return unauthorized();
+
+  await query(
+    'UPDATE users SET push_token = NULL, push_enabled = false WHERE id = $1',
+    [session.userId]
+  );
+
+  return NextResponse.json({ ok: true });
+}
+
+/**
+ * Get current push notification status.
+ */
+export async function GET() {
+  const session = await getSession();
+  if (!session) return unauthorized();
+
+  const user = await query<{ push_enabled: boolean; has_token: boolean }>(
+    'SELECT push_enabled, push_token IS NOT NULL as has_token FROM users WHERE id = $1',
+    [session.userId]
+  );
+
+  if (!user[0]) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+
+  return NextResponse.json({
+    enabled: user[0].push_enabled,
+    hasToken: user[0].has_token,
+  });
 }

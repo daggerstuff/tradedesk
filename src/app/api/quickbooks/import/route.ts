@@ -2,6 +2,38 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/session';
 import { query } from '@/lib/db';
 import { serverError, unauthorized } from '@/lib/api-errors';
+import { refreshQBToken } from '@/lib/quickbooks';
+
+async function getValidToken(userId: string): Promise<{ access_token: string; realm_id: string }> {
+  const rows = await query(
+    'SELECT qb_access_token, qb_refresh_token, qb_realm_id, qb_token_expires_at FROM users WHERE id = $1',
+    [userId]
+  );
+  const user = rows[0] as {
+    qb_access_token: string;
+    qb_refresh_token: string;
+    qb_realm_id: string;
+    qb_token_expires_at: string;
+  } | undefined;
+
+  if (!user?.qb_access_token) {
+    throw new Error('QuickBooks not connected');
+  }
+
+  // Refresh if expiring in next 5 minutes
+  const expiresAt = user.qb_token_expires_at ? new Date(user.qb_token_expires_at).getTime() : 0;
+  if (Date.now() > expiresAt - 5 * 60 * 1000) {
+    const tokens = await refreshQBToken(user.qb_refresh_token);
+    const newExpiresAt = new Date(Date.now() + tokens.expires_in * 1000);
+    await query(
+      'UPDATE users SET qb_access_token = $1, qb_refresh_token = $2, qb_token_expires_at = $3 WHERE id = $4',
+      [tokens.access_token, tokens.refresh_token, newExpiresAt, userId]
+    );
+    return { access_token: tokens.access_token, realm_id: user.qb_realm_id };
+  }
+
+  return { access_token: user.qb_access_token, realm_id: user.qb_realm_id };
+}
 
 // Import customers or expenses from QuickBooks
 export async function POST(req: NextRequest) {
@@ -11,21 +43,13 @@ export async function POST(req: NextRequest) {
   const body = await req.json();
   const type: string = body.type || 'customers';
 
-  const users = await query(
-    'SELECT qb_access_token, qb_realm_id FROM users WHERE id = $1',
-    [session.userId]
-  );
-  const user = users[0] as { qb_access_token: string; qb_realm_id: string } | undefined;
-
-  if (!user?.qb_access_token) {
-    return NextResponse.json({ error: 'QuickBooks not connected' }, { status: 400 });
-  }
-
   try {
+    const { access_token, realm_id } = await getValidToken(session.userId);
+
     if (type === 'expenses') {
       const qbPurchases = await fetchQB(
-        user.qb_access_token,
-        user.qb_realm_id,
+        access_token,
+        realm_id,
         'SELECT * FROM Purchase WHERE TxnDate >= \'2025-01-01\''
       );
 
@@ -65,8 +89,8 @@ export async function POST(req: NextRequest) {
 
     // Default: import customers
     const qbCustomers = await fetchQB(
-      user.qb_access_token,
-      user.qb_realm_id,
+      access_token,
+      realm_id,
       'SELECT * FROM Customer'
     );
 

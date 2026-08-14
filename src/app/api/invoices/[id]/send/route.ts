@@ -1,119 +1,125 @@
-import { NextRequest, NextResponse } from "next/server";
-import { query } from "@/lib/db";
-import { getSession } from "@/lib/session";
-import { sendEmail } from "@/lib/resend";
+import { NextRequest, NextResponse } from 'next/server';
+import { query } from '@/lib/db';
+import { getSession } from '@/lib/session';
+import { renderToBuffer } from '@react-pdf/renderer';
+import InvoicePdf from '@/lib/pdf/invoice';
+import { sendEmailWithAttachments, invoiceEmailHtml } from '@/lib/invoice-email';
 
-export async function POST(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export const dynamic = 'force-dynamic';
+
+interface InvoiceRow {
+  id: string;
+  user_id: string;
+  customer_id: string | null;
+  invoice_number: string;
+  issue_date: string;
+  due_date: string;
+  subtotal: string;
+  tax_rate: string;
+  tax_amount: string;
+  total: string;
+  status: string;
+  notes: string | null;
+  customer_name: string | null;
+  customer_email: string | null;
+  customer_company: string | null;
+  customer_address: string | null;
+  user_name: string | null;
+  user_company: string | null;
+}
+
+interface InvoiceItemRow {
+  description: string;
+  quantity: number;
+  unit_price: number;
+  total: number;
+}
+
+export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await getSession();
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const { id } = await params;
 
-  const invoices = await query(
-    `SELECT i.*, c.name as customer_name, c.email as customer_email, c.portal_token, u.company as user_company, u.name as user_name
+  let toOverride: string | null = null;
+  try {
+    const body = await req.json();
+    toOverride = body?.to || null;
+  } catch {
+    // no body
+  }
+
+  const invoices = await query<InvoiceRow>(
+    `SELECT i.*, c.name as customer_name, c.email as customer_email,
+            c.company_name as customer_company, c.address as customer_address,
+            u.name as user_name, u.company as user_company
      FROM invoices i
      LEFT JOIN customers c ON i.customer_id = c.id
-     LEFT JOIN users u ON u.id = i.user_id
+     LEFT JOIN users u ON i.user_id = u.id
      WHERE i.id = $1 AND i.user_id = $2`,
     [id, session.userId]
   );
-  if (!invoices.length) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  const invoice = invoices[0] as Record<string, unknown>;
-  const customerEmail = invoice.customer_email as string | null;
+  if (!invoices.length) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
-  if (!customerEmail) {
-    return NextResponse.json({ error: "Customer has no email address" }, { status: 400 });
+  const invoice = invoices[0];
+  const recipientEmail = toOverride || invoice.customer_email;
+
+  if (!recipientEmail) {
+    return NextResponse.json({ error: 'Customer has no email address. Provide an email via the "to" field.' }, { status: 400 });
   }
 
-  const items = await query(
-    `SELECT description, quantity, unit_price, total FROM invoice_items WHERE invoice_id = $1 ORDER BY created_at`,
+  const items = await query<InvoiceItemRow>(
+    'SELECT description, quantity, unit_price, total FROM invoice_items WHERE invoice_id = $1 ORDER BY created_at',
     [id]
   );
 
-  const itemsHtml = items.map((item: Record<string, unknown>) => `
-    <tr>
-      <td style="padding: 8px 0; border-bottom: 1px solid #eee;">${item.description}</td>
-      <td style="padding: 8px 0; border-bottom: 1px solid #eee; text-align: center;">${item.quantity}</td>
-      <td style="padding: 8px 0; border-bottom: 1px solid #eee; text-align: right;">$${item.unit_price}</td>
-      <td style="padding: 8px 0; border-bottom: 1px solid #eee; text-align: right;">$${item.total}</td>
-    </tr>
-  `).join("");
+  const pdfBuffer = await renderToBuffer(
+    InvoicePdf({
+      invoiceNumber: invoice.invoice_number,
+      issueDate: invoice.issue_date?.split('T')[0] || '',
+      dueDate: invoice.due_date?.split('T')[0] || '',
+      status: invoice.status,
+      subtotal: Number(invoice.subtotal),
+      taxRate: Number(invoice.tax_rate),
+      taxAmount: Number(invoice.tax_amount),
+      total: Number(invoice.total),
+      notes: invoice.notes,
+      companyName: invoice.user_name || invoice.user_company || null,
+      customerName: invoice.customer_name,
+      customerEmail: invoice.customer_email,
+      customerAddress: invoice.customer_address,
+      items: items.map((item) => ({
+        description: item.description,
+        quantity: item.quantity,
+        unit_price: Number(item.unit_price),
+        total: Number(item.total),
+      })),
+    })
+  );
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://tradedesk.app";
-  const payUrl = invoice.share_token ? `${appUrl}/pay/${invoice.share_token}` : `${appUrl}/pay/${id}`;
-  const portalUrl = invoice.portal_token ? `${appUrl}/portal/${invoice.portal_token}` : null;
-  const senderName = invoice.user_company || invoice.user_name || "TradeDesk";
+  const amount = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Number(invoice.total));
+  const dueDate = new Date(invoice.due_date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
-  const html = `
-    <!DOCTYPE html>
-    <html>
-    <head><meta charset="utf-8"><meta name="viewport" content="width=device-width"></head>
-    <body style="margin: 0; padding: 0; background: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-      <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
-        <!-- Header -->
-        <div style="text-align: center; margin-bottom: 32px;">
-          <h1 style="color: #1e293b; font-size: 28px; margin: 0;">Invoice ${invoice.invoice_number}</h1>
-          <p style="color: #64748b; margin: 8px 0 0;">from ${senderName}</p>
-        </div>
+  const result = await sendEmailWithAttachments({
+    to: recipientEmail,
+    subject: `Invoice ${invoice.invoice_number} — ${amount} due ${dueDate}`,
+    html: invoiceEmailHtml(invoice.invoice_number, amount, dueDate, invoice.customer_name || ''),
+    attachments: [
+      {
+        filename: `invoice-${invoice.invoice_number}.pdf`,
+        content: pdfBuffer.toString('base64'),
+      },
+    ],
+  });
 
-        <!-- Main Card -->
-        <div style="background: white; border-radius: 12px; padding: 32px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-          <p style="color: #334155; font-size: 16px; margin: 0 0 8px;">Hi ${invoice.customer_name},</p>
-          <p style="color: #64748b; font-size: 15px; margin: 0 0 24px;">Here's your invoice for <strong style="color: #1e293b;">$${invoice.total}</strong>, due <strong style="color: #1e293b;">${invoice.due_date}</strong>.</p>
-
-          <!-- Line Items -->
-          <table style="width: 100%; border-collapse: collapse; margin: 24px 0;">
-            <thead>
-              <tr style="border-bottom: 2px solid #e2e8f0;">
-                <th style="text-align: left; padding: 12px 0; color: #64748b; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">Description</th>
-                <th style="text-align: center; padding: 12px 0; color: #64748b; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">Qty</th>
-                <th style="text-align: right; padding: 12px 0; color: #64748b; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">Rate</th>
-                <th style="text-align: right; padding: 12px 0; color: #64748b; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">Total</th>
-              </tr>
-            </thead>
-            <tbody>${itemsHtml}</tbody>
-          </table>
-
-          <!-- Totals -->
-          <div style="border-top: 1px solid #e2e8f0; padding-top: 16px; text-align: right;">
-            <p style="margin: 4px 0; color: #64748b; font-size: 14px;">Subtotal: <span style="color: #1e293b;">$${invoice.subtotal}</span></p>
-            <p style="margin: 4px 0; color: #64748b; font-size: 14px;">Tax (${invoice.tax_rate}%): <span style="color: #1e293b;">$${invoice.tax_amount}</span></p>
-            <p style="margin: 8px 0 0; font-size: 20px; font-weight: 700; color: #1e293b;">Total: $${invoice.total}</p>
-          </div>
-
-          ${invoice.notes ? `<p style="margin-top: 24px; padding: 16px; background: #f8fafc; border-radius: 8px; color: #64748b; font-size: 14px;"><strong>Note:</strong> ${invoice.notes}</p>` : ""}
-
-          <!-- CTA -->
-          <div style="text-align: center; margin-top: 32px;">
-            <a href="${payUrl}" style="display: inline-block; background: #4f46e5; color: white; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 16px;">Pay Now</a>
-          </div>
-        </div>
-
-        <!-- Portal Link -->
-        ${portalUrl ? `<p style="text-align: center; margin-top: 24px; font-size: 14px; color: #64748b;"><a href="${portalUrl}" style="color: #4f46e5;">View all your invoices in your customer portal</a></p>` : ""}
-
-        <!-- Footer -->
-        <p style="text-align: center; color: #94a3b8; font-size: 13px; margin-top: 32px;">Thank you for your business!</p>
-      </div>
-    </body>
-    </html>
-  `;
-
-  try {
-    await sendEmail({
-      to: customerEmail,
-      subject: `Invoice ${invoice.invoice_number} from ${invoice.user_company || 'TradeDesk'}`,
-      html,
-    });
-
-    // Update invoice status to sent if it was draft
-    if (invoice.status === "draft") {
-      await query(`UPDATE invoices SET status = 'sent', updated_at = NOW() WHERE id = $1`, [id]);
-    }
-
-    return NextResponse.json({ success: true });
-  } catch {
-    return NextResponse.json({ error: "Failed to send email" }, { status: 500 });
+  if (result.error) {
+    return NextResponse.json({ error: 'Failed to send email', details: result.error }, { status: 500 });
   }
+
+  if (invoice.status === 'draft') {
+    await query("UPDATE invoices SET status = 'sent', updated_at = NOW() WHERE id = $1", [id]);
+  }
+
+  return NextResponse.json({ success: true, emailId: result.data?.id });
 }

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { queryOne, queryMany } from '@/lib/db';
 import { getSession } from '@/lib/session';
+import { getReferralStats, processReferralReward, applyReferralRewards } from '@/lib/referral-rewards';
 
 export async function GET() {
   const session = await getSession();
@@ -20,9 +21,39 @@ export async function GET() {
     [session.userId]
   );
 
+  // Get reward stats
+  const stats = await getReferralStats(session.userId);
+
   return NextResponse.json({
     referralCode: user?.referral_code,
     count: referrals.length,
     referrals,
+    stats,
   });
+}
+
+export async function POST(req: Request) {
+  const session = await getSession();
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  const { action, referralId, invoiceAmount } = await req.json();
+
+  switch (action) {
+    case 'process_reward':
+      if (!referralId) {
+        return NextResponse.json({ error: 'referralId required' }, { status: 400 });
+      }
+      await processReferralReward(referralId);
+      return NextResponse.json({ success: true });
+
+    case 'apply_rewards':
+      if (!invoiceAmount) {
+        return NextResponse.json({ error: 'invoiceAmount required' }, { status: 400 });
+      }
+      const result = await applyReferralRewards(session.userId, invoiceAmount);
+      return NextResponse.json(result);
+
+    default:
+      return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
+  }
 }
