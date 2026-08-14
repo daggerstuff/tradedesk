@@ -1,0 +1,169 @@
+#!/usr/bin/env python3
+"""orch - Zero-bias research protocol orchestrator CLI.
+
+Wrapper around the 30-run orchestrator, providing a simpler CLI interface.
+
+Usage:
+    orch --runs 30                # Run all 30 bias-free research runs
+    orch --runs 5                 # Run first 5 runs only
+    orch --dry-run               # Preview without executing sandboxes
+    orch --list-profiles         # List available harness profiles
+    orch --list-prompts          # List the 30 research prompts
+
+Each run is isolated in its own E2B sandbox with a unique harness profile
+(neutral skill tokens + structural emphasis texts) and a generic business
+venture research prompt. Sandboxes are destroyed after each run, guaranteeing
+zero domain bias carryover.
+"""
+
+import argparse
+import json
+import subprocess
+import sys
+from pathlib import Path
+
+
+# ---------------------------------------------------------------------------
+# Paths resolved from CWD (the tradedesk repo root)
+# ---------------------------------------------------------------------------
+REPO_ROOT = Path.cwd()
+ORCHESTRATOR = REPO_ROOT / ".agent" / "internal" / "orchestrate-30-runs.py"
+
+
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
+
+def load_json(path: Path) -> dict:
+    with open(path) as f:
+        return json.load(f)
+
+
+def list_profiles() -> None:
+    """Display summary of available harness profiles."""
+    hp = load_json(HARNESS_PROFILES := REPO_ROOT / ".agent" / "internal" / "harness-profiles.json")
+    profiles = hp["profiles"]
+
+    skill_combos = set()
+    orders = set()
+    for p in profiles:
+        skill_combos.add(tuple(sorted(p["skills"])))
+        orders.add(tuple(p["order"]))
+
+    print(f"Total profiles: {len(profiles)}")
+    print(f"Unique skill combos: {len(skill_combos)}")
+    print(f"Unique order permutations: {len(orders)}")
+
+    for p in profiles[:3]:
+        print(f"\n  Run {p['run_id']}:")
+        print(f"    skills: {p['skills']}")
+        print(f"    order:  {p['order']}")
+        print(f"    emphasis: {p['system_prompt_emphasis']}")
+
+
+def list_prompts(prompt_file_path: Optional[str] = None) -> None:
+    """Display the 30 research prompts."""
+    import sys
+    if prompt_file_path:
+        # Try the path as given first, then try .agent/internal/ subdirectory
+        candidate1 = Path(prompt_file_path).resolve()
+        candidate2 = (REPO_ROOT / ".agent" / "internal" / prompt_file_path).resolve()
+        prompt_path = candidate1 if candidate1.exists() else candidate2
+        print(f"DEBUG: candidate1={candidate1}, exists={candidate1.exists()}", file=sys.stderr)
+        print(f"DEBUG: candidate2={candidate2}, exists={candidate2.exists()}", file=sys.stderr)
+        print(f"DEBUG: prompt_path={prompt_path}, exists={prompt_path.exists()}", file=sys.stderr)
+        if not prompt_path.exists():
+            print(f"WARNING: Prompt file not found at {candidate1} or {candidate2}", file=sys.stderr)
+            print("Using default research-prompts.json instead.", file=sys.stderr)
+            prompt_path = RESEARCH_PROMPTS
+        rp = load_json(prompt_path)
+    else:
+        rp = load_json(RESEARCH_PROMPTS := REPO_ROOT / ".agent" / "internal" / "research-prompts.json")
+    for i, entry in enumerate(rp["prompts"], start=1):
+        ptext = entry.get("prompt", "")[:100].replace("\n", " ")
+        print(f"Run {i}: {ptext}...")
+
+
+# ---------------------------------------------------------------------------
+# CLI entry point
+# ---------------------------------------------------------------------------
+
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        prog="orch",
+        description="Zero-bias research protocol orchestrator — runs N isolated "
+                    "E2B-sandboxed research runs with neutral prompts and "
+                    "harness profiles, guaranteeing no domain bias carryover. "
+                    "Each run is isolated in its own sandbox; sandboxes are "
+                    "destroyed after each run.",
+    )
+    parser.add_argument(
+        "--runs",
+        type=int,
+        default=30,
+        help="Number of research runs to execute (default: 30, max: 30)",
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        default=False,
+        help="Preview runs without provisioning E2B sandboxes",
+    )
+    parser.add_argument(
+        "--list-profiles",
+        action="store_true",
+        default=False,
+        help="List available harness profiles and exit",
+    )
+    parser.add_argument(
+        "--list-prompts",
+        action="store_true",
+        default=False,
+        help="List the 30 research prompts and exit",
+    )
+    parser.add_argument(
+        "--prompt",
+        type=str,
+        default=None,
+        help="Path to a custom prompt JSON file (e.g., business.json or BLANK.json). "
+             "If not provided, uses the default research-prompts.json with 30 business venture prompts.",
+    )
+
+    args = parser.parse_args()
+
+    if args.list_profiles:
+        list_profiles()
+        return
+
+    if args.list_prompts:
+        list_prompts(args.prompt)
+        return
+
+    runs = min(max(args.runs, 1), 30)
+    print(f"🔬 orch: zero-bias research protocol")
+    print(f"   Running {runs} isolated E2B sandbox runs (sandboxes destroyed after each)")
+    print()
+
+    # Delegate to the orchestrator
+    cmd = [sys.executable, str(ORCHESTRATOR)]
+    if args.dry_run:
+        cmd.append("--dry-run")
+    if args.prompt:
+        cmd.extend(["--prompt", args.prompt])
+    cmd.extend(["--max-runs", str(runs)])
+
+    result = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
+
+    # Report orchestrator output
+    if result.stdout:
+        print(result.stdout)
+    if result.stderr:
+        print(result.stderr, file=sys.stderr)
+
+    if result.returncode != 0:
+        print(f"\n❌ orchestrator exited with code {result.returncode}", file=sys.stderr)
+        sys.exit(result.returncode)
+
+
+if __name__ == "__main__":
+    main()

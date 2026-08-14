@@ -1,0 +1,424 @@
+{
+  "profiles": [
+    {
+      "run_id": 1,
+      "skills": [
+        "ttt",
+        "rrr",
+        "nnn"
+      ],
+      "order": [
+        "rrr",
+        "ttt",
+        "nnn"
+      ],
+      "system_prompt_emphasis": "route two via right toward five"
+    },
+    {
+      "run_id": 2,
+      "skills": [
+        "kkk",
+        "ddd",
+        "zpl"
+      ],
+      "order": [
+        "zpl",
+        "ddd",
+        "kkk"
+      ],
+      "system_prompt_emphasis": "initiate back advance to left terminate down"
+    },
+    {
+      "run_id": 3,
+      "skills": [
+        "bbb",
+        "aaa",
+        "pqrst"
+      ],
+      "order": [
+        "bbb",
+        "aaa",
+        "pqrst"
+      ],
+      "system_prompt_emphasis": "begin right proceed to two conclude back"
+    },
+    {
+      "run_id": 4,
+      "skills": [
+        "cdef",
+        "yyy",
+        "xxx"
+      ],
+      "order": [
+        "yyy",
+        "xxx",
+        "cdef"
+      ],
+      "system_prompt_emphasis": "initiate two advance to up terminate one"
+    },
+    {
+      "run_id": 5,
+      "skills": [
+        "nnn",
+        "opqr",
+        "xxx"
+      ],
+      "order": [
+        "nnn",
+        "opqr",
+        "xxx"
+      ],
+      "system_prompt_emphasis": "begin down proceed to three conclude five"
+    },
+    {
+      "run_id": 6,
+      "skills": [
+        "uvwx",
+        "fghij",
+        "mro"
+      ],
+      "order": [
+        "fghij",
+        "mro",
+        "uvwx"
+      ],
+      "system_prompt_emphasis": "start with back move to four end with down"
+    },
+    {
+      "run_id": 7,
+      "skills": [
+        "fff",
+        "ggg",
+        "zzz"
+      ],
+      "order": [
+        "ggg",
+        "fff",
+        "zzz"
+      ],
+      "system_prompt_emphasis": "begin five proceed to two conclude two"
+    },
+    {
+      "run_id": 8,
+      "skills": [
+        "jjj",
+        "nnn",
+        "zpl"
+      ],
+      "order": [
+        "nnn",
+        "jjj",
+        "zpl"
+      ],
+      "system_prompt_emphasis": "start with up move to out end with right"
+    },
+    {
+      "run_id": 9,
+      "skills": [
+        "wxy",
+        "tuv",
+        "www"
+      ],
+      "order": [
+        "wxy",
+        "tuv",
+        "www"
+      ],
+      "system_prompt_emphasis": "process in through out using up"
+    },
+    {
+      "run_id": 10,
+      "skills": [
+        "www",
+        "zpl",
+        "yzz"
+      ],
+      "order": [
+        "www",
+        "zpl",
+        "yzz"
+      ],
+      "system_prompt_emphasis": "transition left across left toward back"
+    },
+    {
+      "run_id": 11,
+      "skills": [
+        "ccc",
+        "efgh",
+        "yzab"
+      ],
+      "order": [
+        "ccc",
+        "yzab",
+        "efgh"
+      ],
+      "system_prompt_emphasis": "transition forward across in toward right"
+    },
+    {
+      "run_id": 12,
+      "skills": [
+        "yzz",
+        "rrr",
+        "zpl"
+      ],
+      "order": [
+        "rrr",
+        "yzz",
+        "zpl"
+      ],
+      "system_prompt_emphasis": "transition four across five toward down"
+    },
+    {
+      "run_id": 13,
+      "skills": [
+        "qqq",
+        "lll",
+        "wxy"
+      ],
+      "order": [
+        "wxy",
+        "qqq",
+        "lll"
+      ],
+      "system_prompt_emphasis": "initiate left advance to in terminate five"
+    },
+    {
+      "run_id": 14,
+      "skills": [
+        "iii",
+        "efgh",
+        "ooo"
+      ],
+      "order": [
+        "iii",
+        "efgh",
+        "ooo"
+      ],
+      "system_prompt_emphasis": "transition down across in toward forward"
+    },
+    {
+      "run_id": 15,
+      "skills": [
+        "ghij",
+        "mnop",
+        "wxy"
+      ],
+      "order": [
+        "ghij",
+        "wxy",
+        "mnop"
+      ],
+      "system_prompt_emphasis": "route in via right toward up"
+    },
+    {
+      "run_id": 16,
+      "skills": [
+        "fghij",
+        "ttt",
+        "uvwxy"
+      ],
+      "order": [
+        "uvwxy",
+        "fghij",
+        "ttt"
+      ],
+      "system_prompt_emphasis": "start with down move to left end with two"
+    },
+    {
+      "run_id": 17,
+      "skills": [
+        "kkk",
+        "wxy",
+        "qqq"
+      ],
+      "order": [
+        "kkk",
+        "wxy",
+        "qqq"
+      ],
+      "system_prompt_emphasis": "start with back move to four end with five"
+    },
+    {
+      "run_id": 18,
+      "skills": [
+        "yzz",
+        "aaa",
+        "ooo"
+      ],
+      "order": [
+        "ooo",
+        "yzz",
+        "aaa"
+      ],
+      "system_prompt_emphasis": "route back via left toward two"
+    },
+    {
+      "run_id": 19,
+      "skills": [
+        "abcd",
+        "nnn",
+        "ddd"
+      ],
+      "order": [
+        "nnn",
+        "abcd",
+        "ddd"
+      ],
+      "system_prompt_emphasis": "open right shift to one close right"
+    },
+    {
+      "run_id": 20,
+      "skills": [
+        "ghij",
+        "ppp",
+        "fff"
+      ],
+      "order": [
+        "fff",
+        "ppp",
+        "ghij"
+      ],
+      "system_prompt_emphasis": "first up then in finally left"
+    },
+    {
+      "run_id": 21,
+      "skills": [
+        "yyy",
+        "rstu",
+        "ijkl"
+      ],
+      "order": [
+        "ijkl",
+        "yyy",
+        "rstu"
+      ],
+      "system_prompt_emphasis": "start with left move to three end with in"
+    },
+    {
+      "run_id": 22,
+      "skills": [
+        "ggg",
+        "uvwx",
+        "yyy"
+      ],
+      "order": [
+        "yyy",
+        "uvwx",
+        "ggg"
+      ],
+      "system_prompt_emphasis": "process forward through five using in"
+    },
+    {
+      "run_id": 23,
+      "skills": [
+        "vvv",
+        "jjj",
+        "nnn"
+      ],
+      "order": [
+        "vvv",
+        "jjj",
+        "nnn"
+      ],
+      "system_prompt_emphasis": "process two through out using down"
+    },
+    {
+      "run_id": 24,
+      "skills": [
+        "vvv",
+        "efgh",
+        "qrst"
+      ],
+      "order": [
+        "vvv",
+        "efgh",
+        "qrst"
+      ],
+      "system_prompt_emphasis": "initiate left advance to left terminate four"
+    },
+    {
+      "run_id": 25,
+      "skills": [
+        "qrst",
+        "efgh",
+        "ooo"
+      ],
+      "order": [
+        "ooo",
+        "qrst",
+        "efgh"
+      ],
+      "system_prompt_emphasis": "begin in proceed to down conclude right"
+    },
+    {
+      "run_id": 26,
+      "skills": [
+        "qrst",
+        "lll",
+        "xqk"
+      ],
+      "order": [
+        "lll",
+        "qrst",
+        "xqk"
+      ],
+      "system_prompt_emphasis": "route left via four toward down"
+    },
+    {
+      "run_id": 27,
+      "skills": [
+        "nnn",
+        "klmno",
+        "iii"
+      ],
+      "order": [
+        "klmno",
+        "nnn",
+        "iii"
+      ],
+      "system_prompt_emphasis": "route right via out toward forward"
+    },
+    {
+      "run_id": 28,
+      "skills": [
+        "abcd",
+        "zabcde",
+        "yyy"
+      ],
+      "order": [
+        "abcd",
+        "yyy",
+        "zabcde"
+      ],
+      "system_prompt_emphasis": "route five via four toward out"
+    },
+    {
+      "run_id": 29,
+      "skills": [
+        "uuu",
+        "klmno",
+        "ooo"
+      ],
+      "order": [
+        "uuu",
+        "klmno",
+        "ooo"
+      ],
+      "system_prompt_emphasis": "open two shift to down close one"
+    },
+    {
+      "run_id": 30,
+      "skills": [
+        "xqk",
+        "qrst",
+        "ccc"
+      ],
+      "order": [
+        "xqk",
+        "qrst",
+        "ccc"
+      ],
+      "system_prompt_emphasis": "begin left proceed to two conclude left"
+    }
+  ]
+}

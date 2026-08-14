@@ -1,0 +1,124 @@
+{
+  "prompts": [
+    {
+      "run_id": 1,
+      "prompt": "Research a new <blank> \n\nGenerate a complete business concept including:\n1. What problem does it solve?\n2. What is the solution?\n3. How much revenue could it make (be specific about pricing model and revenue range)?\n4. Why does this idea excite you as an agent?\n\nThen research viability:\n5. Who are the competitors (name specific companies/products)?\n6. What free alternatives exist?\n7. Is there market demand (any data, trends, or signals you can find)?\n8. Would this actually work - would anyone want it?\n\nBe creative and thorough. You can explore any topic or industry - this is intentionally broad.\n\nFormat your output with clear sections for each of these points. The goal is genuine business discovery, not shaping an idea to fit a pre-existing format."
+    },
+    {
+      "run_id": 2,
+      "prompt": "Research a new <blank> \n\nGenerate a complete business concept including:\n1. What problem does it solve?\n2. What is the solution?\n3. How much revenue could it make (be specific about pricing model and revenue range)?\n4. Why does this idea excite you as an agent?\n\nThen research viability:\n5. Who are the competitors (name specific companies/products)?\n6. What free alternatives exist?\n7. Is there market demand (any data, trends, or signals you can find)?\n8. Would this actually work - would anyone want it?\n\nBe creative and thorough. You can explore any topic or industry - this is intentionally broad.\n\nFormat your output with clear sections for each of these points. The goal is genuine business discovery, not shaping an idea to fit a pre-existing format."
+    },
+    {
+      "run_id": 3,
+      "prompt": "Research a new <blank> \n\nGenerate a complete business concept including:\n1. What problem does it solve?\n2. What is the solution?\n3. How much revenue could it make (be specific about pricing model and revenue range)?\n4. Why does this idea excite you as an agent?\n\nThen research viability:\n5. Who are the competitors (name specific companies/products)?\n6. What free alternatives exist?\n7. Is there market demand (any data, trends, or signals you can find)?\n8. Would this actually work - would anyone want it?\n\nBe creative and thorough. You can explore any topic or industry - this is intentionally broad.\n\nFormat your output with clear sections for each of these points. The goal is genuine business discovery, not shaping an idea to fit a pre-existing format."
+    },
+    {
+      "run_id": 4,
+      "prompt": "Research a new <blank> \n\nGenerate a complete business concept including:\n1. What problem does it solve?\n2. What is the solution?\n3. How much revenue could it make (be specific about pricing model and revenue range)?\n4. Why does this idea excite you as an agent?\n\nThen research viability:\n5. Who are the competitors (name specific companies/products)?\n6. What free alternatives exist?\n7. Is there market demand (any data, trends, or signals you can find)?\n8. Would this actually work - would anyone want it?\n\nBe creative and thorough. You can explore any topic or industry - this is intentionally broad.\n\nFormat your output with clear sections for each of these points. The goal is genuine business discovery, not shaping an idea to fit a pre-existing format."
+    },
+    {
+      "run_id": 5,
+      "prompt": "Research a new <blank> \n\nGenerate a complete business concept including:\n1. What problem does it solve?\n2. What is the solution?\n3. How much revenue could it make (be specific about pricing model and revenue range)?\n4. Why does this idea excite you as an agent?\n\nThen research viability:\n5. Who are the competitors (name specific companies/products)?\n6. What free alternatives exist?\n7. Is there market demand (any data, trends, or signals you can find)?\n8. Would this actually work - would anyone want it?\n\nBe creative and thorough. You can explore any topic or industry - this is intentionally broad.\n\nFormat your output with clear sections for each of these points. The goal is genuine business discovery, not shaping an idea to fit a pre-existing format."
+    },
+    {
+      "run_id": 6,
+      "prompt": "Research a new <blank> \n\nGenerate a complete business concept including:\n1. What problem does it solve?\n2. What is the solution?\n3. How much revenue could it make (be specific about pricing model and revenue range)?\n4. Why does this idea excite you as an agent?\n\nThen research viability:\n5. Who are the competitors (name specific companies/products)?\n6. What free alternatives exist?\n7. Is there market demand (any data, trends, or signals you can find)?\n8. Would this actually work - would anyone want it?\n\nBe creative and thorough. You can explore any topic or industry - this is intentionally broad.\n\nFormat your output with clear sections for each of these points. The goal is genuine business discovery, not shaping an idea to fit a pre-existing format."
+    },
+    {
+      "run_id": 7,
+      "prompt": "Research a new <blank> \n\nGenerate a complete business concept including:\n1. What problem does it solve?\n2. What is the solution?\n3. How much revenue could it make (be specific about pricing model and revenue range)?\n4. Why does this idea excite you as an agent?\n\nThen research viability:\n5. Who are the competitors (name specific companies/products)?\n6. What free alternatives exist?\n7. Is there market demand (any data, trends, or signals you can find)?\n8. Would this actually work - would anyone want it?\n\nBe creative and thorough. You can explore any topic or industry - this is intentionally broad.\n\nFormat your output with clear sections for each of these points. The goal is genuine business discovery, not shaping an idea to fit a pre-existing format."
+    },
+    {
+      "run_id": 8,
+      "prompt": "Research a new <blank> \n\nGenerate a complete business concept including:\n1. What problem does it solve?\n2. What is the solution?\n3. How much revenue could it make (be specific about pricing model and revenue range)?\n4. Why does this idea excite you as an agent?\n\nThen research viability:\n5. Who are the competitors (name specific companies/products)?\n6. What free alternatives exist?\n7. Is there market demand (any data, trends, or signals you can find)?\n8. Would this actually work - would anyone want it?\n\nBe creative and thorough. You can explore any topic or industry - this is intentionally broad.\n\nFormat your output with clear sections for each of these points. The goal is genuine business discovery, not shaping an idea to fit a pre-existing format."
+    },
+    {
+      "run_id": 9,
+      "prompt": "Research a new <blank> \n\nGenerate a complete business concept including:\n1. What problem does it solve?\n2. What is the solution?\n3. How much revenue could it make (be specific about pricing model and revenue range)?\n4. Why does this idea excite you as an agent?\n\nThen research viability:\n5. Who are the competitors (name specific companies/products)?\n6. What free alternatives exist?\n7. Is there market demand (any data, trends, or signals you can find)?\n8. Would this actually work - would anyone want it?\n\nBe creative and thorough. You can explore any topic or industry - this is intentionally broad.\n\nFormat your output with clear sections for each of these points. The goal is genuine business discovery, not shaping an idea to fit a pre-existing format."
+    },
+    {
+      "run_id": 10,
+      "prompt": "Research a new <blank> \n\nGenerate a complete business concept including:\n1. What problem does it solve?\n2. What is the solution?\n3. How much revenue could it make (be specific about pricing model and revenue range)?\n4. Why does this idea excite you as an agent?\n\nThen research viability:\n5. Who are the competitors (name specific companies/products)?\n6. What free alternatives exist?\n7. Is there market demand (any data, trends, or signals you can find)?\n8. Would this actually work - would anyone want it?\n\nBe creative and thorough. You can explore any topic or industry - this is intentionally broad.\n\nFormat your output with clear sections for each of these points. The goal is genuine business discovery, not shaping an idea to fit a pre-existing format."
+    },
+    {
+      "run_id": 11,
+      "prompt": "Research a new <blank> \n\nGenerate a complete business concept including:\n1. What problem does it solve?\n2. What is the solution?\n3. How much revenue could it make (be specific about pricing model and revenue range)?\n4. Why does this idea excite you as an agent?\n\nThen research viability:\n5. Who are the competitors (name specific companies/products)?\n6. What free alternatives exist?\n7. Is there market demand (any data, trends, or signals you can find)?\n8. Would this actually work - would anyone want it?\n\nBe creative and thorough. You can explore any topic or industry - this is intentionally broad.\n\nFormat your output with clear sections for each of these points. The goal is genuine business discovery, not shaping an idea to fit a pre-existing format."
+    },
+    {
+      "run_id": 12,
+      "prompt": "Research a new <blank> \n\nGenerate a complete business concept including:\n1. What problem does it solve?\n2. What is the solution?\n3. How much revenue could it make (be specific about pricing model and revenue range)?\n4. Why does this idea excite you as an agent?\n\nThen research viability:\n5. Who are the competitors (name specific companies/products)?\n6. What free alternatives exist?\n7. Is there market demand (any data, trends, or signals you can find)?\n8. Would this actually work - would anyone want it?\n\nBe creative and thorough. You can explore any topic or industry - this is intentionally broad.\n\nFormat your output with clear sections for each of these points. The goal is genuine business discovery, not shaping an idea to fit a pre-existing format."
+    },
+    {
+      "run_id": 13,
+      "prompt": "Research a new <blank> \n\nGenerate a complete business concept including:\n1. What problem does it solve?\n2. What is the solution?\n3. How much revenue could it make (be specific about pricing model and revenue range)?\n4. Why does this idea excite you as an agent?\n\nThen research viability:\n5. Who are the competitors (name specific companies/products)?\n6. What free alternatives exist?\n7. Is there market demand (any data, trends, or signals you can find)?\n8. Would this actually work - would anyone want it?\n\nBe creative and thorough. You can explore any topic or industry - this is intentionally broad.\n\nFormat your output with clear sections for each of these points. The goal is genuine business discovery, not shaping an idea to fit a pre-existing format."
+    },
+    {
+      "run_id": 14,
+      "prompt": "Research a new <blank> \n\nGenerate a complete business concept including:\n1. What problem does it solve?\n2. What is the solution?\n3. How much revenue could it make (be specific about pricing model and revenue range)?\n4. Why does this idea excite you as an agent?\n\nThen research viability:\n5. Who are the competitors (name specific companies/products)?\n6. What free alternatives exist?\n7. Is there market demand (any data, trends, or signals you can find)?\n8. Would this actually work - would anyone want it?\n\nBe creative and thorough. You can explore any topic or industry - this is intentionally broad.\n\nFormat your output with clear sections for each of these points. The goal is genuine business discovery, not shaping an idea to fit a pre-existing format."
+    },
+    {
+      "run_id": 15,
+      "prompt": "Research a new <blank> \n\nGenerate a complete business concept including:\n1. What problem does it solve?\n2. What is the solution?\n3. How much revenue could it make (be specific about pricing model and revenue range)?\n4. Why does this idea excite you as an agent?\n\nThen research viability:\n5. Who are the competitors (name specific companies/products)?\n6. What free alternatives exist?\n7. Is there market demand (any data, trends, or signals you can find)?\n8. Would this actually work - would anyone want it?\n\nBe creative and thorough. You can explore any topic or industry - this is intentionally broad.\n\nFormat your output with clear sections for each of these points. The goal is genuine business discovery, not shaping an idea to fit a pre-existing format."
+    },
+    {
+      "run_id": 16,
+      "prompt": "Research a new <blank> \n\nGenerate a complete business concept including:\n1. What problem does it solve?\n2. What is the solution?\n3. How much revenue could it make (be specific about pricing model and revenue range)?\n4. Why does this idea excite you as an agent?\n\nThen research viability:\n5. Who are the competitors (name specific companies/products)?\n6. What free alternatives exist?\n7. Is there market demand (any data, trends, or signals you can find)?\n8. Would this actually work - would anyone want it?\n\nBe creative and thorough. You can explore any topic or industry - this is intentionally broad.\n\nFormat your output with clear sections for each of these points. The goal is genuine business discovery, not shaping an idea to fit a pre-existing format."
+    },
+    {
+      "run_id": 17,
+      "prompt": "Research a new <blank> \n\nGenerate a complete business concept including:\n1. What problem does it solve?\n2. What is the solution?\n3. How much revenue could it make (be specific about pricing model and revenue range)?\n4. Why does this idea excite you as an agent?\n\nThen research viability:\n5. Who are the competitors (name specific companies/products)?\n6. What free alternatives exist?\n7. Is there market demand (any data, trends, or signals you can find)?\n8. Would this actually work - would anyone want it?\n\nBe creative and thorough. You can explore any topic or industry - this is intentionally broad.\n\nFormat your output with clear sections for each of these points. The goal is genuine business discovery, not shaping an idea to fit a pre-existing format."
+    },
+    {
+      "run_id": 18,
+      "prompt": "Research a new <blank> \n\nGenerate a complete business concept including:\n1. What problem does it solve?\n2. What is the solution?\n3. How much revenue could it make (be specific about pricing model and revenue range)?\n4. Why does this idea excite you as an agent?\n\nThen research viability:\n5. Who are the competitors (name specific companies/products)?\n6. What free alternatives exist?\n7. Is there market demand (any data, trends, or signals you can find)?\n8. Would this actually work - would anyone want it?\n\nBe creative and thorough. You can explore any topic or industry - this is intentionally broad.\n\nFormat your output with clear sections for each of these points. The goal is genuine business discovery, not shaping an idea to fit a pre-existing format."
+    },
+    {
+      "run_id": 19,
+      "prompt": "Research a new <blank> \n\nGenerate a complete business concept including:\n1. What problem does it solve?\n2. What is the solution?\n3. How much revenue could it make (be specific about pricing model and revenue range)?\n4. Why does this idea excite you as an agent?\n\nThen research viability:\n5. Who are the competitors (name specific companies/products)?\n6. What free alternatives exist?\n7. Is there market demand (any data, trends, or signals you can find)?\n8. Would this actually work - would anyone want it?\n\nBe creative and thorough. You can explore any topic or industry - this is intentionally broad.\n\nFormat your output with clear sections for each of these points. The goal is genuine business discovery, not shaping an idea to fit a pre-existing format."
+    },
+    {
+      "run_id": 20,
+      "prompt": "Research a new <blank> \n\nGenerate a complete business concept including:\n1. What problem does it solve?\n2. What is the solution?\n3. How much revenue could it make (be specific about pricing model and revenue range)?\n4. Why does this idea excite you as an agent?\n\nThen research viability:\n5. Who are the competitors (name specific companies/products)?\n6. What free alternatives exist?\n7. Is there market demand (any data, trends, or signals you can find)?\n8. Would this actually work - would anyone want it?\n\nBe creative and thorough. You can explore any topic or industry - this is intentionally broad.\n\nFormat your output with clear sections for each of these points. The goal is genuine business discovery, not shaping an idea to fit a pre-existing format."
+    },
+    {
+      "run_id": 21,
+      "prompt": "Research a new <blank> \n\nGenerate a complete business concept including:\n1. What problem does it solve?\n2. What is the solution?\n3. How much revenue could it make (be specific about pricing model and revenue range)?\n4. Why does this idea excite you as an agent?\n\nThen research viability:\n5. Who are the competitors (name specific companies/products)?\n6. What free alternatives exist?\n7. Is there market demand (any data, trends, or signals you can find)?\n8. Would this actually work - would anyone want it?\n\nBe creative and thorough. You can explore any topic or industry - this is intentionally broad.\n\nFormat your output with clear sections for each of these points. The goal is genuine business discovery, not shaping an idea to fit a pre-existing format."
+    },
+    {
+      "run_id": 22,
+      "prompt": "Research a new <blank> \n\nGenerate a complete business concept including:\n1. What problem does it solve?\n2. What is the solution?\n3. How much revenue could it make (be specific about pricing model and revenue range)?\n4. Why does this idea excite you as an agent?\n\nThen research viability:\n5. Who are the competitors (name specific companies/products)?\n6. What free alternatives exist?\n7. Is there market demand (any data, trends, or signals you can find)?\n8. Would this actually work - would anyone want it?\n\nBe creative and thorough. You can explore any topic or industry - this is intentionally broad.\n\nFormat your output with clear sections for each of these points. The goal is genuine business discovery, not shaping an idea to fit a pre-existing format."
+    },
+    {
+      "run_id": 23,
+      "prompt": "Research a new <blank> \n\nGenerate a complete business concept including:\n1. What problem does it solve?\n2. What is the solution?\n3. How much revenue could it make (be specific about pricing model and revenue range)?\n4. Why does this idea excite you as an agent?\n\nThen research viability:\n5. Who are the competitors (name specific companies/products)?\n6. What free alternatives exist?\n7. Is there market demand (any data, trends, or signals you can find)?\n8. Would this actually work - would anyone want it?\n\nBe creative and thorough. You can explore any topic or industry - this is intentionally broad.\n\nFormat your output with clear sections for each of these points. The goal is genuine business discovery, not shaping an idea to fit a pre-existing format."
+    },
+    {
+      "run_id": 24,
+      "prompt": "Research a new <blank> \n\nGenerate a complete business concept including:\n1. What problem does it solve?\n2. What is the solution?\n3. How much revenue could it make (be specific about pricing model and revenue range)?\n4. Why does this idea excite you as an agent?\n\nThen research viability:\n5. Who are the competitors (name specific companies/products)?\n6. What free alternatives exist?\n7. Is there market demand (any data, trends, or signals you can find)?\n8. Would this actually work - would anyone want it?\n\nBe creative and thorough. You can explore any topic or industry - this is intentionally broad.\n\nFormat your output with clear sections for each of these points. The goal is genuine business discovery, not shaping an idea to fit a pre-existing format."
+    },
+    {
+      "run_id": 25,
+      "prompt": "Research a new <blank> \n\nGenerate a complete business concept including:\n1. What problem does it solve?\n2. What is the solution?\n3. How much revenue could it make (be specific about pricing model and revenue range)?\n4. Why does this idea excite you as an agent?\n\nThen research viability:\n5. Who are the competitors (name specific companies/products)?\n6. What free alternatives exist?\n7. Is there market demand (any data, trends, or signals you can find)?\n8. Would this actually work - would anyone want it?\n\nBe creative and thorough. You can explore any topic or industry - this is intentionally broad.\n\nFormat your output with clear sections for each of these points. The goal is genuine business discovery, not shaping an idea to fit a pre-existing format."
+    },
+    {
+      "run_id": 26,
+      "prompt": "Research a new <blank> \n\nGenerate a complete business concept including:\n1. What problem does it solve?\n2. What is the solution?\n3. How much revenue could it make (be specific about pricing model and revenue range)?\n4. Why does this idea excite you as an agent?\n\nThen research viability:\n5. Who are the competitors (name specific companies/products)?\n6. What free alternatives exist?\n7. Is there market demand (any data, trends, or signals you can find)?\n8. Would this actually work - would anyone want it?\n\nBe creative and thorough. You can explore any topic or industry - this is intentionally broad.\n\nFormat your output with clear sections for each of these points. The goal is genuine business discovery, not shaping an idea to fit a pre-existing format."
+    },
+    {
+      "run_id": 27,
+      "prompt": "Research a new <blank> \n\nGenerate a complete business concept including:\n1. What problem does it solve?\n2. What is the solution?\n3. How much revenue could it make (be specific about pricing model and revenue range)?\n4. Why does this idea excite you as an agent?\n\nThen research viability:\n5. Who are the competitors (name specific companies/products)?\n6. What free alternatives exist?\n7. Is there market demand (any data, trends, or signals you can find)?\n8. Would this actually work - would anyone want it?\n\nBe creative and thorough. You can explore any topic or industry - this is intentionally broad.\n\nFormat your output with clear sections for each of these points. The goal is genuine business discovery, not shaping an idea to fit a pre-existing format."
+    },
+    {
+      "run_id": 28,
+      "prompt": "Research a new <blank> \n\nGenerate a complete business concept including:\n1. What problem does it solve?\n2. What is the solution?\n3. How much revenue could it make (be specific about pricing model and revenue range)?\n4. Why does this idea excite you as an agent?\n\nThen research viability:\n5. Who are the competitors (name specific companies/products)?\n6. What free alternatives exist?\n7. Is there market demand (any data, trends, or signals you can find)?\n8. Would this actually work - would anyone want it?\n\nBe creative and thorough. You can explore any topic or industry - this is intentionally broad.\n\nFormat your output with clear sections for each of these points. The goal is genuine business discovery, not shaping an idea to fit a pre-existing format."
+    },
+    {
+      "run_id": 29,
+      "prompt": "Research a new <blank> \n\nGenerate a complete business concept including:\n1. What problem does it solve?\n2. What is the solution?\n3. How much revenue could it make (be specific about pricing model and revenue range)?\n4. Why does this idea excite you as an agent?\n\nThen research viability:\n5. Who are the competitors (name specific companies/products)?\n6. What free alternatives exist?\n7. Is there market demand (any data, trends, or signals you can find)?\n8. Would this actually work - would anyone want it?\n\nBe creative and thorough. You can explore any topic or industry - this is intentionally broad.\n\nFormat your output with clear sections for each of these points. The goal is genuine business discovery, not shaping an idea to fit a pre-existing format."
+    },
+    {
+      "run_id": 30,
+      "prompt": "Research a new <blank> \n\nGenerate a complete business concept including:\n1. What problem does it solve?\n2. What is the solution?\n3. How much revenue could it make (be specific about pricing model and revenue range)?\n4. Why does this idea excite you as an agent?\n\nThen research viability:\n5. Who are the competitors (name specific companies/products)?\n6. What free alternatives exist?\n7. Is there market demand (any data, trends, or signals you can find)?\n8. Would this actually work - would anyone want it?\n\nBe creative and thorough. You can explore any topic or industry - this is intentionally broad.\n\nFormat your output with clear sections for each of these points. The goal is genuine business discovery, not shaping an idea to fit a pre-existing format."
+    }
+  ]
+}
