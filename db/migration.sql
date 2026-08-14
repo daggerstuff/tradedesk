@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS users (
   qb_refresh_token TEXT,
   qb_realm_id      TEXT,
   qb_connected_at  TIMESTAMPTZ,
+  qb_token_expires_at TIMESTAMPTZ,
   referred_by      TEXT REFERENCES users(id) ON DELETE SET NULL,
   created_at       TIMESTAMPTZ DEFAULT NOW()
 );
@@ -43,6 +44,7 @@ CREATE TABLE IF NOT EXISTS customers (
   company_name  TEXT,
   address       TEXT,
   portal_token  TEXT UNIQUE,
+  qb_customer_id TEXT,
   created_at    TIMESTAMPTZ DEFAULT NOW(),
   updated_at    TIMESTAMPTZ DEFAULT NOW()
 );
@@ -62,6 +64,7 @@ CREATE TABLE IF NOT EXISTS invoices (
   status         TEXT NOT NULL DEFAULT 'draft',
   notes          TEXT,
   share_token    TEXT UNIQUE,
+  qb_invoice_id  TEXT,
   created_at     TIMESTAMPTZ DEFAULT NOW(),
   updated_at     TIMESTAMPTZ DEFAULT NOW()
 );
@@ -252,6 +255,23 @@ CREATE TABLE IF NOT EXISTS referrals (
 CREATE INDEX IF NOT EXISTS idx_referrals_referrer ON referrals(referrer_id);
 CREATE INDEX IF NOT EXISTS idx_referrals_code ON referrals(referral_code);
 
+-- Referral rewards
+CREATE TABLE IF NOT EXISTS referral_rewards (
+  id           TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id      TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  type         TEXT NOT NULL CHECK (type IN ('free_month', 'discount_percent', 'credit')),
+  value        NUMERIC(10,2) NOT NULL,
+  source_referral_id TEXT NOT NULL REFERENCES referrals(id) ON DELETE CASCADE,
+  status       TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'active', 'used', 'expired')),
+  expires_at   TIMESTAMPTZ,
+  created_at   TIMESTAMPTZ DEFAULT NOW(),
+  applied_at   TIMESTAMPTZ
+);
+
+CREATE INDEX IF NOT EXISTS idx_referral_rewards_user ON referral_rewards(user_id);
+CREATE INDEX IF NOT EXISTS idx_referral_rewards_status ON referral_rewards(status);
+CREATE INDEX IF NOT EXISTS idx_referral_rewards_source ON referral_rewards(source_referral_id);
+
 -- Indexes for common queries
 CREATE INDEX IF NOT EXISTS idx_invoices_user_id        ON invoices(user_id);
 CREATE INDEX IF NOT EXISTS idx_invoices_customer_id   ON invoices(customer_id);
@@ -296,6 +316,66 @@ CREATE TABLE IF NOT EXISTS recurring_invoice_items (
 
 CREATE INDEX IF NOT EXISTS idx_recurring_invoices_user_id ON recurring_invoices(user_id);
 CREATE INDEX IF NOT EXISTS idx_recurring_invoices_active ON recurring_invoices(is_active);
+
+-- Dunning / Collections settings per user
+CREATE TABLE IF NOT EXISTS dunning_settings (
+  id                     TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id                TEXT UNIQUE NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  late_fee_enabled       BOOLEAN DEFAULT false,
+  late_fee_amount        NUMERIC(10,2) DEFAULT 0,
+  late_fee_type          TEXT DEFAULT 'fixed' CHECK (late_fee_type IN ('fixed', 'percent')),
+  grace_period_days      INTEGER DEFAULT 1,
+  auto_charge_late_fee   BOOLEAN DEFAULT false,
+  dunning_enabled        BOOLEAN DEFAULT true,
+  max_dunning_attempts   INTEGER DEFAULT 4,
+  created_at             TIMESTAMPTZ DEFAULT NOW(),
+  updated_at             TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Dunning log (every collection action taken)
+CREATE TABLE IF NOT EXISTS dunning_logs (
+  id           TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id      TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  invoice_id   TEXT NOT NULL REFERENCES invoices(id) ON DELETE CASCADE,
+  attempt      INTEGER NOT NULL DEFAULT 1,
+  action       TEXT NOT NULL CHECK (action IN ('reminder_email', 'late_fee_charged', 'payment_plan_offered', 'final_notice', 'escalation')),
+  channel      TEXT NOT NULL DEFAULT 'email' CHECK (channel IN ('email', 'push', 'sms')),
+  amount_charged NUMERIC(12,2),
+  sent_at      TIMESTAMPTZ DEFAULT NOW(),
+  opened       BOOLEAN DEFAULT false,
+  clicked      BOOLEAN DEFAULT false,
+  created_at   TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Payment plans (installments for large invoices)
+CREATE TABLE IF NOT EXISTS payment_plans (
+  id              TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id         TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  invoice_id      TEXT NOT NULL REFERENCES invoices(id) ON DELETE CASCADE,
+  total_amount    NUMERIC(12,2) NOT NULL,
+  installment_count INTEGER NOT NULL DEFAULT 2,
+  installments    JSONB NOT NULL DEFAULT '[]',
+  status          TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'completed', 'cancelled', 'defaulted')),
+  stripe_payment_intent_id TEXT,
+  created_at      TIMESTAMPTZ DEFAULT NOW(),
+  updated_at      TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Add collections fields to invoices
+ALTER TABLE invoices ADD COLUMN IF NOT EXISTS dunning_status TEXT DEFAULT 'current' CHECK (dunning_status IN ('current', 'overdue_3', 'overdue_7', 'overdue_14', 'overdue_30', 'collections', 'resolved'));
+ALTER TABLE invoices ADD COLUMN IF NOT EXISTS late_fee_charged NUMERIC(12,2) DEFAULT 0;
+ALTER TABLE invoices ADD COLUMN IF NOT EXISTS last_dunning_sent_at TIMESTAMPTZ;
+ALTER TABLE invoices ADD COLUMN IF NOT EXISTS dunning_attempts INTEGER DEFAULT 0;
+ALTER TABLE invoices ADD COLUMN IF NOT EXISTS payment_plan_id TEXT REFERENCES payment_plans(id) ON DELETE SET NULL;
+
+-- Indexes
+CREATE INDEX IF NOT EXISTS idx_dunning_settings_user ON dunning_settings(user_id);
+CREATE INDEX IF NOT EXISTS idx_dunning_logs_user ON dunning_logs(user_id);
+CREATE INDEX IF NOT EXISTS idx_dunning_logs_invoice ON dunning_logs(invoice_id);
+CREATE INDEX IF NOT EXISTS idx_payment_plans_user ON payment_plans(user_id);
+CREATE INDEX IF NOT EXISTS idx_payment_plans_invoice ON payment_plans(invoice_id);
+CREATE INDEX IF NOT EXISTS idx_invoices_dunning_status ON invoices(dunning_status);
+CREATE INDEX IF NOT EXISTS idx_invoices_overdue ON invoices(due_date, status) WHERE status = 'sent';
 
 -- Company settings (add columns to users)
 ALTER TABLE users ADD COLUMN IF NOT EXISTS company_address TEXT;

@@ -96,3 +96,52 @@ psql $DATABASE_URL < db/migration.sql
 ## License
 
 MIT
+
+## Zero-Bias Research Protocol
+
+This project includes a framework for running 30 isolated research runs with zero bias between runs. Each run:
+
+- Provisions a fresh E2B sandbox with internet access only
+- Executes `execute-research-run.py` with a unique harness profile and research prompt
+- Captures the output markdown to `.agent/internal/run-ideas/run-{N}-idea.md`
+- Destroys the sandbox after each run (eliminating state carryover)
+
+### Orchestrator CLI (`orch`)
+
+A command-line tool at `.agent/internal/orch` (symlinked to `/home/vivi/tradedesk/orch`) for controlling the research protocol:
+
+```
+# List available prompt files
+orch --list-prompts                    # Default: business-venture prompts
+orch --list-prompts --prompt business.json  # From business.json
+orch --list-prompts --prompt BLANK.json   # From BLANK.json ("Research a new <blank>")
+
+# Run research runs
+orch --runs N                        # Run N research runs (default: 30)
+orch --runs N --prompt business.json  # With business prompts
+orch --runs N --prompt BLANK.json      # With blank-topic prompts
+
+# Dry run (no E2B sandboxes provisioned)
+orch --dry-run                       # Preview default 30 runs
+orch --dry-run --prompt BLANK.json   # Preview with blank-topic prompts
+```
+
+### Prompt Library
+
+Prompt files are stored in `.agent/internal/`:
+
+| File | Prompt Format |
+|---|---|
+| `research-prompts.json` | "Research a new business venture." (default, business-venture focus) |
+| `business.json` | "Research a new business venture." (same as default) |
+| `BLANK.json` | "Research a new <blank>" (topic-agnostic, user-editable) |
+
+Users can create custom prompt files as `<topic>.json` under `.agent/internal/` following the same JSON structure (`"prompts"` array with `run_id` and `prompt` fields). Use `--prompt <topic>.json` with any `orch` command.
+
+### Framework Files
+
+- `.agent/internal/harness-profiles.json` — 30 unique skill subsets/orders/emphases
+- `.agent/internal/execute-research-run.py` — Per-run LangChain executor
+- `.agent/internal/orchestrate-30-runs.py` — E2B provision/run/destroy orchestrator
+- `.agent/internal/test_harness.py` — Structural validation suite
+- `.agent/internal/REPRODUCIBILITY_GUIDE.md` — Documentation for reusability
