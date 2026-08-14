@@ -43,3 +43,24 @@ mobile/node_modules/
 mobile/package-lock.json
 
 AGENTS.md
+
+# python cache
+__pycache__/
+*.pyc
+
+# local IDE/agent configs
+.claude/
+.codex/
+.commandcode/
+
+# scrape outputs
+.just-scrape/
+
+# session exports
+command-code-session-*.html
+
+# one-off test/scratch scripts
+fix_harness.py
+.agent/internal/test_harness.py
+.agent/internal/test_run.py
+.agent/internal/test-direct-file.md
