@@ -2,153 +2,106 @@
 
 ## Overview
 
-This workflow enables running any number of unbiased research runs using E2B sandboxes. Each run is completely isolated (sandbox provisioned, executed, destroyed), ensuring zero bias carryover between runs.
+This workflow runs N unbiased research runs using E2B sandboxes. Each run
+is completely isolated: a fresh sandbox is provisioned, the research prompt
+is executed, output is captured, and the sandbox is destroyed. A single
+harness is used for all runs — isolation comes from sandbox destruction,
+not from swapping cosmetic configurations.
 
 ## Quick Start
 
 ### 1. Prerequisites
 
 - E2B CLI installed and authenticated: `e2b sandbox list` should work
-- Python 3.8+ with required packages: `pip install e2b python-multipart langchain-core`
-- `.env` file with `E2B_API_KEY` and `E2B_ACCESS_TOKEN` (or export as environment variables)
+- `.env` file with `E2B_API_KEY` and `E2B_ACCESS_TOKEN`
 
 ### 2. Directory Structure
 
 ```
-.tradedesk/
-├── .agent/
-│   ├── internal/
-│   │   ├── harness-profiles.json        # Harness profiles (skill subsets, orders, prompts)
-│   │   ├── research-prompts.json        # Research prompts per run
-│   │   ├── execute-research-run.py      # Per-run research executor
-│   │   ├── orchestrate-runs.py          # Main orchestrator
-│   │   └── run-ideas/                   # Output ideas (run-1-idea.md, run-2-idea.md, ...)
-│   └── ...
-├── .e2b.toml                            # E2B config (auto-generated)
-└── .env                                 # API keys
+.agent/
+├── internal/
+│   ├── research-prompts.json      # Default 30 business-venture prompts
+│   ├── business.json               # Business-venture prompt preset
+│   ├── BLANK.json                  # Topic-agnostic blank preset
+│   ├── execute-research-run.py     # Per-run research executor
+│   ├── orchestrate-30-runs.py      # Sandbox provision/run/destroy orchestrator
+│   ├── orch                        # CLI wrapper
+│   └── run-ideas/                  # Output (run-1-idea.md, run-2-idea.md, ...)
 ```
 
-### 3. Core Files
+### 3. CLI Usage
 
-#### `harness-profiles.json`
-Contains `N` harness profiles, each with:
-- `run_id`: Unique identifier (1..N)
-- `skills`: List of skill names to activate
-- `order`: Execution order for skills
-- `system_prompt_emphasis`: System prompt text (key bias-prevention element)
-- `tool_config`: Optional tool configuration
+```bash
+# Run all 30 research runs
+orch --runs 30
 
-#### `research-prompts.json`
-Contains `N` research prompts, each with:
-- `run_id`: Unique identifier (1..N)
-- `prompt`: The research prompt text (should follow the "Research a new business venture" format)
+# Run first 5 only
+orch --runs 5
+
+# Dry run (preview without provisioning sandboxes)
+orch --dry-run
+
+# List prompts from the default preset
+orch --list-prompts
+
+# List prompts from a specific preset
+orch --list-prompts --prompt BLANK.json
+
+# Run with a custom prompt preset
+orch --runs 30 --prompt BLANK.json
+```
+
+### 4. Core Files
+
+#### `research-prompts.json` (default)
+Contains 30 research prompts, each with `run_id` and `prompt`. Prompts follow
+the "Research a new business venture" format with 8 required output sections.
 
 #### `execute-research-run.py`
-Runs inside an E2B sandbox and:
-1. Cleans environment variables that might carry state
-2. Generates research output markdown directly from the prompt + harness profile
-3. Writes output to the specified path
+Receives `run_number`, `prompt_text`, and `output_path`. Produces an 8-section
+markdown file. When run inside an E2B sandbox, has internet access for research.
 
-#### `orchestrate-runs.py`
-Main orchestrator that:
-1. Loads prompts and profiles
-2. Provisions E2B sandboxes per run
-3. Executes research runs
-4. Validates output
-5. Destroys sandboxes (critical for zero bias)
+#### `orchestrate-30-runs.py`
+Provisions a fresh E2B sandbox per run, executes the research script with
+the run's prompt, validates output, destroys the sandbox, then moves to the
+next run.
 
-### 4. Running a Single Research Run
+#### Prompt Presets
+- `research-prompts.json` — default business-venture prompts
+- `business.json` — identical to default (explicit preset name)
+- `BLANK.json` — topic-agnostic "Research a new \<blank\>" prompts for custom use
 
-```bash
-# Run a specific research run (e.g., run #5)
-python .agent/internal/orchestrate-runs.py --run-number 5
-```
-
-#### Arguments:
-- `--run-number N`: Run just run N (1-indexed). If omitted, runs all runs up to `--max-runs`.
-- `--max-runs N`: Maximum number of runs (default: all available).
-- `--dry-run`: Show what would be executed without running sandboxes.
-- `--output-dir DIR`: Output directory (default: `.agent/internal/run-ideas`).
-
-### 5. Running All Runs
-
-```bash
-python .agent/internal/orchestrate-runs.py
-```
-
-Or with limits:
-```bash
-python .agent/internal/orchestrate-runs.py --max-runs 10
-```
-
-### 6. Zero-Bias Guarantees
-
-The following structural guarantees prevent bias carryover:
+### 5. Zero-Bias Guarantees
 
 | Guarantee | Implementation |
 |-----------|----------------|
-| **Sandbox isolation** | Each run gets a fresh E2B sandbox; sandbox is destroyed after execution |
-| **Environment cleanup** | `execute-research-run.py` clears `RESEARCH_`, `PRIOR_`, `HARNESS_`, `E2B_`, `SANDBOX_` env vars |
-| **Unique harness profiles** | Each run has distinct skill subsets, order permutations, and system prompt emphases |
-| **Fresh prompts** | Each run uses a standalone prompt (no cumulative context) |
-| **No shared memory** | Foresight/memory state is not shared between runs (sandbox destruction handles this) |
+| **Sandbox isolation** | Each run gets a fresh E2B sandbox; destroyed after execution |
+| **No carryover** | Sandbox destruction removes all filesystem, memory, and process state |
+| **Prompt-only direction** | The research prompt is the only input that shapes research direction |
+| **No shared state** | No harness profiles, no skill tokens, no cumulative context between runs |
 
-### 7. Customizing for New Research Projects
+### 6. Customizing
 
-#### Adding New Runs (up to N):
+#### Create a new prompt preset:
 
-1. **Add to `harness-profiles.json`**: Copy an existing profile and modify:
-   - `run_id`: New number
-   - `skills`: Different skill subset
-   - `order`: Different permutation
-   - `system_prompt_emphasis`: Unique emphasis text
+1. Copy `BLANK.json` to `<topic>.json` in `.agent/internal/`
+2. Edit the `prompt` fields — each prompt starts with "Research a new \<topic\>"
+3. Run: `orch --runs 30 --prompt <topic>.json`
 
-2. **Add to `research-prompts.json`**: Copy an existing prompt and modify the prompt text (keep the 8-section structure).
+#### Changing the output format:
 
-3. **Update counts**: Ensure both files have the same number of entries.
+The executor expects 8 markdown sections (case-insensitive headers):
+- `## problem`
+- `## solution`
+- `## revenue_and_excitement`
+- `## competitors`
+- `## free_alternatives`
+- `## market_demand`
+- `## would_anyone_want`
+- `## decision`
 
-#### Changing the Research Format:
+### 7. Troubleshooting
 
-The output expects 8 sections (case-insensitive):
-- `problem:`
-- `solution:`
-- `revenue_and_excitement:`
-- `competitors:`
-- `free_alternatives:`
-- `market_demand:`
-- `would_anyone_want:`
-- `decision:`
-
-The `execute-research-run.py` currently generates a static template. To make it actually research, you would need to integrate an LLM agent (the original approach). The current direct-generation approach is a placeholder that ensures the 8-section format is always present.
-
-### 8. Adapting for Non-SaaS / Non-Trade Contexts
-
-The current default profiles/prompts are generic. To adapt:
-
-1. **Update `system_prompt_emphasis`** in harness profiles to reflect your domain/constraints
-2. **Update prompt text** in research-prompts to match your research focus
-3. **Modify skill subsets** to include relevant skills for your domain
-
-Example: For academic research, you might use skills like `tavily-research`, `competitor-analysis`, `ai-research-explore` with appropriate prompt emphases.
-
-### 9. Troubleshooting
-
-#### Common Issues:
-
-- **"e2b sandbox create" not found**: Ensure E2B CLI is installed and in PATH
-- **PEP 668 pip errors**: Use `--break-system-packages` or venv inside sandboxes
-- **LangChain import errors**: The current setup uses direct markdown generation (bypasses LangChain)
-- **Output missing sections**: Ensure `execute-research-run.py` output contains all 8 required section headers
-- **Sandbox destroy fails**: This is expected in some environments; the orchestrator handles this gracefully
-
-#### Verifying Zero Bias:
-
-After running, check that:
-1. All 30 (or N) output files exist in `.agent/internal/run-ideas/`
-2. Each file has all 8 required sections
-3. System prompt emphases are all different (check `harness-profiles.json`)
-4. Skill subsets vary across runs (check `harness-profiles.json`)
-
-### 10. License & Maintenance
-
-This workflow is maintained as part of the tradedesk research infrastructure. For updates or contributions, modify the core files in `.agent/internal/` and verify with `--dry-run` before executing full runs.
+- **`e2b` not found**: Ensure E2B CLI is installed and in PATH
+- **Sandbox destroy fails**: Non-fatal; orchestrator continues to next run
+- **Missing sections in output**: Check `execute-research-run.py` output format
